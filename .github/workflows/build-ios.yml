@@ -1,0 +1,142 @@
+name: 构建 iOS App (奴契)
+
+on:
+  push:
+    branches: [ "主要的", "main", "master" ]
+    paths:
+      - 'ios/**'
+      - 'project.yml'
+      - '.github/workflows/**'
+  workflow_dispatch:
+
+env:
+  APP_NAME: 奴契
+  BUNDLE_ID: com.gaojingping.nuqi
+
+jobs:
+  build-ios:
+    name: 构建 iOS IPA
+    runs-on: macos-14
+    timeout-minutes: 45
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 显示 Xcode 版本
+        run: |
+          xcodebuild -version
+          xcrun --show-sdk-version
+
+      - name: 安装 XcodeGen
+        run: |
+          brew install xcodegen
+          xcodegen --version
+
+      - name: 生成 Xcode 工程
+        run: |
+          xcodegen generate
+          ls -la *.xcodeproj
+          # 修复项目格式版本：XcodeGen 2.46 默认生成 format 77 (Xcode 16)，Xcode 15.4 只支持到 56
+          echo "=== 修改前 objectVersion ==="
+          grep "objectVersion" "${{ env.APP_NAME }}.xcodeproj/project.pbxproj"
+          sed -i '' 's/objectVersion = 77;/objectVersion = 56;/g' "${{ env.APP_NAME }}.xcodeproj/project.pbxproj"
+          sed -i '' 's/objectVersion = 76;/objectVersion = 56;/g' "${{ env.APP_NAME }}.xcodeproj/project.pbxproj"
+          echo "=== 修改后 objectVersion ==="
+          grep "objectVersion" "${{ env.APP_NAME }}.xcodeproj/project.pbxproj"
+
+      - name: 构建 Release (arm64, 无签名)
+        run: |
+          xcodebuild \
+            -project "${{ env.APP_NAME }}.xcodeproj" \
+            -scheme "${{ env.APP_NAME }}" \
+            -configuration Release \
+            -sdk iphoneos \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath build \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            DEVELOPMENT_TEAM="" \
+            ONLY_ACTIVE_ARCH=NO \
+            ARCHS=arm64 \
+            build
+        timeout-minutes: 30
+
+      - name: 验证 .app 产物
+        run: |
+          APP_PATH="build/Build/Products/Release-iphoneos/${{ env.APP_NAME }}.app"
+          if [ -d "$APP_PATH" ]; then
+            echo "✅ .app 构建成功"
+            ls -la "$APP_PATH"
+            echo ""
+            echo "=== 包内容 ==="
+            ls -la "$APP_PATH/"
+            echo ""
+            echo "=== web 资源 ==="
+            ls -la "$APP_PATH/web/" 2>/dev/null || echo "web 目录未找到"
+            echo ""
+            echo "=== 二进制架构 ==="
+            lipo -info "$APP_PATH/${{ env.APP_NAME }}" 2>/dev/null || file "$APP_PATH/${{ env.APP_NAME }}"
+          else
+            echo "❌ .app 未找到"
+            find build -name "*.app" -type d 2>/dev/null
+            exit 1
+          fi
+
+      - name: 打包未签名 IPA (TrollStore 可安装)
+        run: |
+          APP_PATH="build/Build/Products/Release-iphoneos/${{ env.APP_NAME }}.app"
+          PAYLOAD_DIR="ipa/Payload"
+          mkdir -p "$PAYLOAD_DIR"
+          cp -R "$APP_PATH" "$PAYLOAD_DIR/"
+
+          cat > ipa/iTunesMetadata.plist << 'EOF'
+          <?xml version="1.0" encoding="UTF-8"?>
+          <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+          <plist version="1.0">
+          <dict>
+              <key>bundleDisplayName</key>
+              <string>奴契</string>
+              <key>bundleShortVersionString</key>
+              <string>1.0.0</string>
+              <key>bundleVersion</key>
+              <string>1</string>
+              <key>itemName</key>
+              <string>奴契</string>
+              <key>softwareVersionBundleId</key>
+              <string>com.gaojingping.nuqi</string>
+          </dict>
+          </plist>
+          EOF
+
+          cd ipa
+          zip -qr "../奴契_未签名.ipa" Payload iTunesMetadata.plist
+          cd ..
+
+          echo "✅ IPA 打包完成"
+          ls -lh "奴契_未签名.ipa"
+
+      - name: 上传 IPA 构建产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: 奴契-iOS-IPA
+          path: 奴契_未签名.ipa
+          retention-days: 30
+
+      - name: 上传 .app 调试产物
+        uses: actions/upload-artifact@v4
+        with:
+          name: 奴契-iOS-APP
+          path: build/Build/Products/Release-iphoneos/
+          retention-days: 7
+
+      - name: 构建总结
+        run: |
+          echo "## 构建完成 ✅"
+          echo ""
+          echo "- App 名称: 奴契"
+          echo "- Bundle ID: com.gaojingping.nuqi"
+          echo "- 版本: 1.0.0 (1)"
+          echo "- 架构: arm64"
+          echo "- 签名: 未签名（TrollStore 可直接安装）"

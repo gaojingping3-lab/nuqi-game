@@ -1,0 +1,1569 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1a0a0a">
+<title>⛓️ 奴契 ⛓️</title>
+<script>
+window.__supabaseLoaded=false;
+function loadSupabaseSDK(){
+  const sources=["https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2","https://unpkg.com/@supabase/supabase-js@2"];
+  let i=0;
+  (function tryLoad(){
+    if(i>=sources.length){window.dispatchEvent(new CustomEvent("supabase-sdk-failed"));return;}
+    const s=document.createElement("script");s.src=sources[i];s.async=false;
+    s.onload=()=>{if(window.supabase?.createClient){window.__supabaseLoaded=true;window.dispatchEvent(new CustomEvent("supabase-sdk-ready"));}else{i++;tryLoad();}};
+    s.onerror=()=>{i++;tryLoad();};
+    document.head.appendChild(s);
+  })();
+}
+loadSupabaseSDK();
+</script>
+<style>
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;margin:0;padding:0}
+html,body{width:100%;min-height:100%;font-family:"Courier New",monospace;background:#0d0a0b;color:#dac5c0;overflow-x:hidden}
+button,input{font-family:inherit;border:0;outline:none}
+button{cursor:pointer;touch-action:manipulation;-webkit-appearance:none}
+button:active{transform:scale(.96);filter:brightness(.7)}
+.hidden{display:none!important}
+.app{min-height:100vh;padding:calc(env(safe-area-inset-top)+12px) 12px calc(env(safe-area-inset-bottom)+18px);background:radial-gradient(circle at 10% 10%,rgba(60,10,10,.9)0%,transparent 40%),radial-gradient(circle at 90% 80%,rgba(30,5,20,.8)0%,transparent 50%),#0a0507}
+.page{max-width:760px;margin:0 auto}
+.card{background:rgba(20,12,15,.93);border:1px solid #3f1f2a;border-radius:10px 22px 10px 22px;padding:15px;margin-bottom:11px;box-shadow:0 0 28px rgba(120,0,20,.18)}
+.header{text-align:center;margin-bottom:14px}
+.logo{font-size:28px;font-weight:900;color:#b03a4a;text-shadow:0 0 18px #7a1a2a;letter-spacing:2px}
+.subtitle{margin-top:3px;font-size:12px;color:#7a5a5a;font-style:italic}
+.section-title{font-size:15px;font-weight:800;color:#b05a6a;margin-bottom:10px}
+.online-title{font-size:14px;font-weight:900;color:#b55a6a;margin-bottom:8px}
+.online-status{padding:8px 11px;border-radius:11px;background:#1a0d10;color:#7a5a5a;font-size:12px;margin-bottom:8px;border:1px solid #3a1f2a}
+.online-status.connected{color:#7a8a5a;border-color:#4a5a2a}
+.online-input{width:100%;height:40px;border:1px solid #3f1f2a;background:rgba(10,5,7,.9);border-radius:11px;padding:0 11px;color:#c0a0a0;font-size:13px;margin-bottom:7px}
+.role-buttons,.online-buttons,.manager-buttons,.command-buttons,.bottom-buttons{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.role-btn,.online-btn,.manager-btn,.command-btn,.bottom-btn,.small-btn,.template-btn,.difficulty,.feedback-btn,.primary-btn,.roll-btn,.chat-send-btn,.voice-btn,.call-btn{border-radius:11px;font-weight:800}
+.role-btn{min-height:40px;background:#1a0d10;color:#8a6a6a;border:2px solid transparent;font-size:13px}
+.role-btn.active{background:#2a151a;border-color:#7a2a3a;color:#c05a6a}
+.role-btn.locked{opacity:.4;pointer-events:none}
+.online-btn{min-height:40px;background:#2a151a;color:#b05a6a;font-size:13px}
+.online-btn.dark{background:#1a0f15;color:#8a5a9a}
+.room-code{margin-top:7px;padding:9px;border-radius:11px;background:#1a0d10;text-align:center;font-size:11px;color:#7a5a5a;border:1px solid #3a1f2a;word-break:break-all}
+.difficulty-list,.template-list{display:grid;gap:7px}
+.difficulty,.template-btn{width:100%;padding:12px;text-align:left;background:#1a0d10;border:2px solid transparent;color:#b09090;font-size:14px}
+.difficulty.active,.template-btn.active{background:#2a151a;border-color:#7a2a3a;color:#c05a6a}
+.diff-top{display:flex;justify-content:space-between;font-weight:800}
+.diff-info{margin-top:2px;font-size:11px;color:#7a5a5a}
+.setting-label{font-size:12px;color:#8a6a6a;margin-bottom:5px}
+.number-box{display:flex;align-items:center;justify-content:center;gap:8px}
+.number-box input{width:90px;height:40px;border:1px solid #3f1f2a;background:#1a0d10;border-radius:11px;text-align:center;font-size:16px;font-weight:700;color:#c0a0a0}
+.small-btn{width:40px;height:40px;background:#2a151a;color:#b05a6a;font-size:18px;display:flex;align-items:center;justify-content:center}
+.primary-btn{width:100%;min-height:48px;margin-top:12px;color:#1a0d10;font-size:15px;font-weight:900;background:linear-gradient(135deg,#5a1a2a,#8a2a3a);box-shadow:0 0 20px rgba(120,20,40,.35)}
+.manager-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.manager-title{font-weight:900;color:#b05a6a;font-size:14px}
+.manager-count{font-size:11px;color:#7a5a5a}
+.manager-btn{min-height:38px;background:#2a151a;color:#b05a6a;font-size:12px}
+.manager-btn.danger{background:#2a0a0a;color:#b03a3a}
+.manager-btn.purple{background:#1a0a1a;color:#8a5a9a}
+.file-input{display:none}
+.file-hint{margin-top:8px;padding:9px 11px;background:#1a0d10;border-radius:11px;color:#7a5a5a;font-size:11px;line-height:1.45;border:1px solid #3a1f2a}
+.task-list{margin-top:8px;max-height:220px;overflow-y:auto}
+.task-item{display:flex;align-items:center;gap:7px;padding:8px;margin-bottom:5px;background:#1a0d10;border-radius:10px;border-left:3px solid #4a1a2a}
+.task-index{width:20px;height:20px;border-radius:50%;background:#2a0a1a;color:#8a3a4a;font-size:10px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.task-content{flex:1;font-size:12px;line-height:1.35;color:#b0a0a0;word-break:break-word}
+.task-type{font-size:9px;padding:2px 5px;border-radius:5px;font-weight:700;flex-shrink:0}
+.task-type.bladder{background:#1a2a3a;color:#6a9aca}
+.task-type.posture{background:#1a2a1a;color:#6aca8a}
+.task-type.punish{background:#3a1a1a;color:#ca6a6a}
+.task-type.sex{background:#2a1a3a;color:#aa6aca}
+.task-type.other{background:#2a2a1a;color:#caca6a}
+.task-delete{width:26px;height:26px;border-radius:7px;background:#2a0a0a;color:#b03a3a;font-size:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.type-filter{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:8px}
+.type-filter-btn{padding:4px 9px;border-radius:16px;font-size:10px;font-weight:700;background:#1a0d10;color:#8a6a6a;border:1px solid #2a1a1a}
+.type-filter-btn.active{background:#2a151a;color:#c05a6a;border-color:#7a2a3a}
+.progress-head{display:flex;justify-content:space-between;font-size:11px;color:#7a5a5a;margin-bottom:6px}
+.progress-bg{height:9px;border-radius:999px;background:#1a0d10;overflow:hidden}
+.progress-fill{height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#3a0a1a,#7a1a2a);transition:width .3s}
+.board-visual{margin-top:10px;display:flex;flex-wrap:wrap;gap:2px;justify-content:center;max-height:80px;overflow-y:auto}
+.board-cell{width:12px;height:12px;border-radius:2px;background:#1a0d10;border:1px solid #2a1a1a}
+.board-cell.passed{background:#3a1a22}
+.board-cell.current{background:#7a1a2a;box-shadow:0 0 6px rgba(176,58,74,.7);transform:scale(1.3)}
+.punishment-bar{margin-top:8px;padding:8px 11px;border-radius:11px;background:#1a0d10;border:1px solid #3a1f2a;display:flex;justify-content:space-between;font-size:12px}
+.punishment-value{font-weight:900;color:#b03a4a}
+.punishment-bar.locked{border-color:#b03a3a;background:#2a0a0a}
+.dice{width:78px;height:78px;margin:4px auto 8px;display:flex;align-items:center;justify-content:center;background:#1a0d10;border-radius:18px;font-size:38px;border:2px solid #3a1f2a}
+.dice.rolling{animation:shake .4s ease}
+@keyframes shake{0%{transform:rotate(0)}25%{transform:rotate(-8deg) scale(1.06)}50%{transform:rotate(8deg)}75%{transform:rotate(-5deg)}100%{transform:rotate(0)}}
+.roll-btn{width:100%;max-width:230px;height:46px;color:#1a0d10;font-size:15px;font-weight:900;background:linear-gradient(135deg,#4a1a2a,#7a1a2a);display:block;margin:0 auto}
+.roll-btn:disabled{background:#2a1a1a;color:#5a4a4a}
+.event-icon{font-size:34px;text-align:center}
+.event-title{margin-top:3px;font-size:17px;font-weight:900;color:#b03a4a;text-align:center}
+.event-text{margin-top:10px;padding:12px;border-radius:12px;background:#1a0d10;line-height:1.55;font-size:13px;color:#d0b0b0;border:1px solid #3a1f2a;word-break:break-word}
+.event-meta{margin-top:6px;font-size:11px;color:#7a5a5a;text-align:center}
+.feedback-buttons{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-top:12px}
+.feedback-btn{padding:10px 3px;font-size:11px}
+.feedback-btn.done{background:#1a3a1a;color:#8aca8a}
+.feedback-btn.abandon{background:#3a1a1a;color:#ca8a8a}
+.feedback-btn.lighten{background:#2a1a3a;color:#aa8aca}
+.command-input{width:100%;min-height:40px;border:1px solid #3f1f2a;border-radius:11px;background:#1a0d10;color:#c0a0a0;padding:9px 11px;margin-bottom:7px;font-size:13px}
+.command-log{margin-top:8px;max-height:120px;overflow-y:auto;padding:9px;border-radius:11px;background:#1a0d10;font-size:11px;border:1px solid #3a1f2a;line-height:1.45}
+.spectator-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.spectator-item{padding:10px;border-radius:11px;background:#1a0d10;text-align:center;border:1px solid #2a1a1a}
+.spectator-item.wide{grid-column:1/-1}
+.spectator-label{font-size:10px;color:#7a5a5a}
+.spectator-value{margin-top:2px;font-size:15px;font-weight:900;color:#b03a4a}
+.spectator-task{margin-top:5px;padding:9px;border-radius:9px;background:#0d0a0a;font-size:12px;line-height:1.45;color:#b0a0a0;border:1px solid #2a1a1a;word-break:break-word}
+.chat-log{max-height:180px;overflow-y:auto;padding:9px;border-radius:11px;background:#1a0d10;margin-bottom:7px}
+.chat-empty{text-align:center;color:#5a3a3a;font-size:11px;padding:14px}
+.chat-message{margin-bottom:7px;display:flex;flex-direction:column}
+.chat-message.me{align-items:flex-end}
+.chat-message.other{align-items:flex-start}
+.chat-name{font-size:9px;color:#7a5a5a;margin-bottom:1px}
+.chat-bubble{max-width:78%;padding:8px 11px;border-radius:12px;font-size:12px;line-height:1.45;word-break:break-word;border:1px solid #2a1a1a}
+.chat-message.me .chat-bubble{background:#1a0a0a;color:#a04a5a;border-color:#3a1a2a;border-bottom-right-radius:3px}
+.chat-message.other .chat-bubble{background:#0a0a1a;color:#7a5a8a;border-color:#2a1a3a;border-bottom-left-radius:3px}
+.chat-input-row{display:grid;grid-template-columns:42px 1fr 64px;gap:7px}
+.chat-input{height:38px;border:1px solid #3f1f2a;border-radius:11px;background:#1a0d10;color:#c0a0a0;padding:0 11px;font-size:12px}
+.chat-send-btn{height:38px;background:#2a151a;color:#b05a6a;font-size:12px}
+.voice-btn{height:38px;background:#2a151a;color:#b05a6a;font-size:16px;display:flex;align-items:center;justify-content:center}
+.voice-btn.recording{background:#8a1a2a;color:#1a0d10;animation:vp .8s ease-in-out infinite}
+@keyframes vp{0%,100%{transform:scale(1)}50%{transform:scale(1.08)}}
+.voice-play{display:flex;align-items:center;gap:6px;cursor:pointer}
+.feeling-title{text-align:center;font-size:12px;color:#7a5a5a;margin-bottom:8px}
+.feeling-buttons{display:grid;grid-template-columns:repeat(10,1fr);gap:3px}
+.feeling-btn{aspect-ratio:1;border-radius:50%;background:#1a0d10;color:#7a3a4a;font-size:11px;font-weight:800;border:1px solid #2a1a1a}
+.feeling-btn.active{background:#7a1a2a;color:#1a0d10;box-shadow:0 0 12px rgba(120,20,40,.5)}
+.gameover{text-align:center;padding:22px}
+.gameover-icon{font-size:44px}
+.gameover-title{margin-top:5px;font-size:20px;font-weight:900;color:#b03a4a}
+.gameover-text{margin-top:5px;color:#7a5a5a;font-size:12px}
+.toast{position:fixed;left:50%;bottom:calc(env(safe-area-inset-bottom)+22px);transform:translateX(-50%) translateY(14px);max-width:84%;padding:9px 15px;border-radius:999px;background:rgba(10,5,5,.96);color:#b0a0a0;font-size:12px;opacity:0;pointer-events:none;transition:.25s;z-index:9999;border:1px solid #3a1a2a}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.music-float{position:fixed;right:14px;bottom:70px;z-index:10000;touch-action:none;}
+.music-ball{width:48px;height:48px;border-radius:50%;background:linear-gradient(135deg,#2a0a1a,#5a1a2a);color:#b05a6a;font-size:20px;display:flex;align-items:center;justify-content:center;border:2px solid #4a1a2a;box-shadow:0 0 30px rgba(120,20,40,.4);cursor:grab;}
+.music-ball:active{cursor:grabbing;}
+.music-panel{position:absolute;bottom:56px;right:0;width:250px;background:rgba(15,8,10,.97);border-radius:16px;padding:13px;border:1px solid #3a1a2a}
+.music-panel-title{font-size:13px;font-weight:900;color:#b03a4a;text-align:center;margin-bottom:8px}
+.music-upload-btn{width:100%;height:36px;border-radius:10px;background:#2a151a;color:#b05a6a;font-weight:800;font-size:12px}
+.music-song-name{font-size:11px;color:#b0a0a0;text-align:center;margin:7px 0;min-height:16px}
+.music-progress-row{display:flex;align-items:center;gap:5px;margin-bottom:7px}
+.music-time{font-size:9px;color:#7a5a5a;min-width:26px;text-align:center}
+.music-progress-bg{flex:1;height:5px;border-radius:999px;background:#1a0d10;overflow:hidden;cursor:pointer}
+.music-progress-fill{height:100%;width:0;background:linear-gradient(90deg,#3a0a1a,#7a1a2a)}
+.music-play-btn{width:40px;height:40px;border-radius:50%;background:linear-gradient(135deg,#3a1a2a,#7a1a2a);color:#1a0d10;font-size:15px;display:flex;align-items:center;justify-content:center;margin:0 auto}
+.loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(10,5,7,.85);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:99999;backdrop-filter:blur(4px);}
+.loading-spinner{width:44px;height:44px;border:4px solid #3a1f2a;border-top-color:#b03a4a;border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg)}}
+.loading-text{margin-top:14px;color:#b0a0a0;font-size:14px;letter-spacing:1px}
+.music-controls{display:flex;align-items:center;gap:8px;margin:6px 0 8px;}
+.music-volume-row{flex:1;display:flex;align-items:center;gap:4px;}
+.music-volume-row input[type="range"]{flex:1;height:4px;background:#2a1a1a;border-radius:999px;outline:none;appearance:none;}
+.music-volume-row input[type="range"]::-webkit-slider-thumb{appearance:none;width:12px;height:12px;border-radius:50%;background:#b03a4a;cursor:pointer;}
+.music-loop-btn{background:#2a151a;color:#b05a6a;border:1px solid #3a1f2a;border-radius:8px;padding:4px 10px;font-size:14px;font-weight:700;line-height:1;min-width:36px;height:30px;}
+.music-loop-btn.active{background:#4a1a2a;color:#e05a6a;border-color:#7a2a3a;}
+.music-extra-row{display:flex;align-items:center;justify-content:space-between;gap:6px;margin-top:4px;}
+.bottom-btn{
+  min-height:40px;
+  background:#2a151a;
+  color:#b05a6a;
+  font-size:13px;
+  border:1px solid #3f1f2a;
+  box-shadow:0 0 10px rgba(120,20,40,.2);
+}
+.bottom-btn:active{
+  transform:scale(.96);
+  filter:brightness(.7);
+}
+.command-btn{
+  min-height:40px;
+  background:#2a151a;
+  color:#b05a6a;
+  font-size:13px;
+  border:1px solid #3f1f2a;
+  box-shadow:0 0 10px rgba(120,20,40,.2);
+}
+.command-btn.danger{
+  background:#2a0a0a;
+  color:#b03a3a;
+  border-color:#3a1a1a;
+}
+/* 通话按钮样式 */
+.call-btn{
+  height:38px;
+  background:#2a151a;
+  color:#b05a6a;
+  font-size:16px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:11px;
+}
+.call-btn.active{
+  background:#8a1a2a;
+  color:#1a0d10;
+  animation:vp .8s ease-in-out infinite;
+}
+@media(max-width:430px){.logo{font-size:24px}.board-cell{width:11px;height:11px}.chat-input-row{grid-template-columns:38px 1fr 58px}}
+</style>
+</head>
+<body>
+<div class="app"><div class="page">
+<header class="header">
+  <div class="logo">⛓️ 奴契 ⛓️</div>
+  <div class="subtitle">你的身体和尿意，从此只属于主人</div>
+</header>
+
+<div id="loadingOverlay" class="loading-overlay hidden">
+  <div class="loading-spinner"></div>
+  <div class="loading-text" id="loadingText">加载中...</div>
+</div>
+
+<div class="card">
+  <div class="online-title">🔗 双人调教房间</div>
+  <div id="onlineStatus" class="online-status">还没被锁进房间</div>
+  <input id="roomInput" class="online-input" placeholder="输入房间号，例如 123456" maxlength="20">
+  <div class="role-buttons" style="margin-bottom:7px">
+    <button id="playerRoleBtn" class="role-btn active" type="button">🐕 我是狗</button>
+    <button id="spectatorRoleBtn" class="role-btn" type="button">👑 我是主人</button>
+  </div>
+  <div class="online-buttons">
+    <button id="createRoomBtn" class="online-btn" type="button">🔒 开房上锁</button>
+    <button id="joinRoomBtn" class="online-btn dark" type="button">🔗 钻进笼子</button>
+  </div>
+  <div id="roomCode" class="room-code hidden"></div>
+  <button id="leaveRoomBtn" class="online-btn hidden" type="button" style="width:100%;margin-top:7px;background:#3a1a1a;color:#ca6a6a;">🚪 退出房间</button>
+</div>
+
+<section id="startPage">
+  <div class="card">
+    <div class="section-title">🩸 选择被虐强度</div>
+    <div class="difficulty-list">
+      <button class="difficulty active" data-difficulty="easy"><div class="diff-top"><span>🕊️ 轻虐</span><span>40 格</span></div><div class="diff-info">还算留点脸</div></button>
+      <button class="difficulty" data-difficulty="normal"><div class="diff-top"><span>⚖️ 正常调教</span><span>50 格</span></div><div class="diff-info">标准狗训练</div></button>
+      <button class="difficulty" data-difficulty="hard"><div class="diff-top"><span>🔥 狠虐</span><span>60 格</span></div><div class="diff-info">彻底当尿壶</div></button>
+    </div>
+  </div>
+  <div class="card">
+    <div class="section-title">⚙️ 奴契条款</div>
+    <div style="margin-bottom:12px">
+      <div class="setting-label">被拖着走的步数</div>
+      <div class="number-box">
+        <button class="small-btn" id="lengthMinus" type="button">−</button>
+        <input id="lengthInput" type="number" min="1" max="999" value="40" inputmode="numeric">
+        <button class="small-btn" id="lengthPlus" type="button">＋</button>
+      </div>
+    </div>
+    <div>
+      <div class="setting-label">调教模板（方便分类，内容你自己导）</div>
+      <div class="template-list" id="templateList">
+        <button class="template-btn active" data-template="all" type="button">🩸 全部任务</button>
+        <button class="template-btn" data-template="bladder" type="button">💧 专玩尿意</button>
+        <button class="template-btn" data-template="posture" type="button">🧎 专玩姿势</button>
+        <button class="template-btn" data-template="sex" type="button">🔥 专玩下体</button>
+      </div>
+    </div>
+    <button class="primary-btn" id="startBtn" type="button">⛓️ 开始当狗</button>
+  </div>
+  <div class="card">
+    <div class="manager-header"><div class="manager-title">📜 日常玩弄指令</div><div class="manager-count" id="taskCount">0 条</div></div>
+    <div class="type-filter" id="taskTypeFilter">
+      <button class="type-filter-btn active" data-type="all" type="button">全部</button>
+      <button class="type-filter-btn" data-type="bladder" type="button">💧 尿</button>
+      <button class="type-filter-btn" data-type="posture" type="button">🧎 姿势</button>
+      <button class="type-filter-btn" data-type="punish" type="button">⚡ 惩罚</button>
+      <button class="type-filter-btn" data-type="sex" type="button">🔥 下体</button>
+    </div>
+    <div class="manager-buttons">
+      <button class="manager-btn" id="importTaskBtn" type="button">📂 导入你的骚指令</button>
+      <button class="manager-btn danger" id="clearTaskBtn" type="button">🗑️ 清空</button>
+    </div>
+    <input id="taskFile" class="file-input" type="file" accept=".txt,.csv,.json,text/plain">
+    <div class="file-hint">支持 TXT / CSV / JSON，每行一条。导入后<strong>自动识别</strong>类型。</div>
+    <div class="task-list" id="taskList"></div>
+  </div>
+  <div class="card">
+    <div class="manager-header"><div class="manager-title">🩸 最终处置指令</div><div class="manager-count" id="finalTaskCount">0 条</div></div>
+    <div class="manager-buttons">
+      <button class="manager-btn purple" id="importFinalTaskBtn" type="button">📂 导入最终处置</button>
+      <button class="manager-btn danger" id="clearFinalTaskBtn" type="button">🗑️ 清空</button>
+    </div>
+    <input id="finalTaskFile" class="file-input" type="file" accept=".txt,.csv,.json,text/plain">
+    <div class="file-hint">走完全程后强制执行的最终指令</div>
+    <div class="task-list" id="finalTaskList"></div>
+  </div>
+</section>
+
+<section id="gamePage" class="hidden">
+  <div class="card" id="progressCard">
+    <div class="progress-head"><span>被拖进度</span><span id="progressText">0%</span></div>
+    <div class="progress-bg"><div class="progress-fill" id="progressFill"></div></div>
+    <div class="board-visual" id="boardVisual"></div>
+    <div class="punishment-bar" id="punishmentBar">
+      <span>欠下的惩罚</span>
+      <span class="punishment-value" id="punishmentDisplay">0 / 3</span>
+    </div>
+  </div>
+  <div class="card" id="diceCard" style="text-align:center">
+    <div class="dice" id="dice">🎲</div>
+    <div id="diceResult" style="font-size:12px;color:#a28a96;margin-bottom:10px">准备好被决定命运了吗？</div>
+    <button class="roll-btn" id="rollBtn" type="button">🎲 求主人掷骰</button>
+  </div>
+  <div class="card hidden" id="eventCard" style="text-align:center">
+    <div class="event-icon" id="eventIcon">⚠️</div>
+    <div class="event-title" id="eventTitle">指令降临</div>
+    <div class="event-text" id="eventText"></div>
+    <div class="event-meta" id="eventMeta"></div>
+    <div class="feedback-buttons" id="feedbackButtons">
+      <button class="feedback-btn done" id="fbDone" type="button">✅ 狗已执行</button>
+      <button class="feedback-btn abandon" id="fbAbandon" type="button">❌ 狗敢违抗</button>
+      <button class="feedback-btn lighten" id="fbLighten" type="button">🙏 求主人轻点</button>
+    </div>
+  </div>
+  <div id="commandCard" class="card hidden">
+    <div class="section-title">📣 主人的命令</div>
+    <input id="commandInput" class="command-input" placeholder="写下你要狗立刻做的事……" maxlength="200">
+    <div class="command-buttons">
+      <button id="sendCommandBtn" class="command-btn" type="button">📣 下令</button>
+      <button id="clearCommandBtn" class="command-btn danger" type="button">抹掉</button>
+    </div>
+    <div id="commandLog" class="command-log">还没有发过命令</div>
+  </div>
+  <div id="spectatorCard" class="card hidden">
+    <div class="section-title">👁️ 监视这条狗</div>
+    <div class="spectator-grid">
+      <div class="spectator-item"><div class="spectator-label">位置</div><div id="remotePosition" class="spectator-value">0</div></div>
+      <div class="spectator-item"><div class="spectator-label">骰子</div><div id="remoteDice" class="spectator-value">-</div></div>
+      <div class="spectator-item"><div class="spectator-label">骚度</div><div id="remoteFeeling" class="spectator-value">1</div></div>
+      <div class="spectator-item"><div class="spectator-label">惩罚债</div><div id="remotePunishment" class="spectator-value">0</div></div>
+      <div class="spectator-item wide"><div class="spectator-label">当前状态</div><div id="remoteStatus" class="spectator-task">空闲</div></div>
+    </div>
+  </div>
+  <div id="chatCard" class="card hidden">
+    <div class="section-title">🔮 主人与狗的私语</div>
+    <div id="chatLog" class="chat-log"><div class="chat-empty">还没人说话</div></div>
+    <div class="chat-input-row">
+      <!-- 语音通话按钮替代原来的语音消息按钮 -->
+      <button id="callBtn" class="call-btn" type="button" title="语音通话">📞</button>
+      <input id="chatInput" class="chat-input" maxlength="200" placeholder="说点什么……">
+      <button id="sendChatBtn" class="chat-send-btn" type="button">发送</button>
+    </div>
+  </div>
+  <div class="card gameover hidden" id="gameOver">
+    <div class="gameover-icon">🩸</div>
+    <div class="gameover-title" id="gameOverTitle">狗已经走完全程</div>
+    <div class="gameover-text" id="gameOverText">但项圈永远不会解开</div>
+    <button class="primary-btn" id="restartBtn" type="button">再玩一次这条狗</button>
+  </div>
+  <div class="card">
+    <div class="feeling-title">🩸 汇报你现在有多骚 / 多急</div>
+    <div class="feeling-buttons" id="feelingButtons"></div>
+  </div>
+  <div id="videoCard" class="card hidden">
+    <div id="videoCardHeader" style="display:flex;justify-content:space-between;align-items:center;cursor:pointer;user-select:none;">
+      <div class="section-title" style="margin-bottom:0;">📹 单向视频</div>
+      <span id="videoCardToggle" style="font-size:14px;color:#7a5a5a;">▼</span>
+    </div>
+    <div id="videoCardBody">
+      <div id="remoteVideoWrap" class="hidden">
+        <video id="remoteVideo" autoplay playsinline style="width:100%;border-radius:11px;background:#000;aspect-ratio:4/3;object-fit:cover;margin-top:10px;"></video>
+      </div>
+      <div id="localVideoWrap" class="hidden">
+        <video id="localVideo" autoplay playsinline muted style="width:100%;border-radius:11px;background:#000;aspect-ratio:4/3;object-fit:cover;margin-top:10px;"></video>
+      </div>
+      <div id="videoStatus" style="text-align:center;font-size:12px;color:#7a5a5a;margin-top:8px;">未连接</div>
+      <div id="videoControls" style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:8px;">
+        <button id="requestVideoBtn" class="command-btn hidden" type="button">📹 请求视频</button>
+        <button id="cameraOnBtn" class="command-btn hidden" type="button">📹 开启摄像头</button>
+        <button id="endVideoBtn" class="command-btn danger" type="button">🚫 结束视频</button>
+      </div>
+    </div>
+  </div>
+  <div id="videoRequestPopup" class="hidden" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:99996;">
+    <div style="background:rgba(20,12,15,.98);border:1px solid #3f1f2a;border-radius:16px;padding:20px;max-width:320px;width:84%;text-align:center;box-shadow:0 0 40px rgba(120,0,20,.4);">
+      <div style="font-size:32px;margin-bottom:8px;">📹</div>
+      <div style="font-size:16px;font-weight:900;color:#b03a4a;margin-bottom:10px;">主人请求查看你的视频</div>
+      <div style="font-size:13px;color:#d0b0b0;margin-bottom:14px;">是否允许主人开启你的摄像头？</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+        <button id="videoAllowBtn" class="command-btn" type="button" style="min-height:40px;font-size:13px;background:#1a3a1a;color:#8aca8a;border-color:#2a4a2a;">允许</button>
+        <button id="videoDenyBtn" class="command-btn danger" type="button" style="min-height:40px;font-size:13px;">拒绝</button>
+      </div>
+    </div>
+  </div>
+  <div class="bottom-buttons">
+    <button class="bottom-btn" id="backBtn" type="button">← 逃回准备区</button>
+    <button class="bottom-btn" id="newGameBtn" type="button">↻ 重开一局</button>
+  </div>
+</section>
+</div></div>
+
+<div class="music-float" id="musicFloat">
+  <div class="music-ball" id="musicBall">🎵</div>
+  <div class="music-panel hidden" id="musicPanel">
+    <div class="music-panel-title">💀 调教配乐</div>
+    <input type="file" id="musicFile" class="file-input" accept=".mp3,.wav,.ogg,.m4a,.flac,.aac,.opus,.wma,.webm,audio/*">
+    <button class="music-upload-btn" id="musicUploadBtn" type="button">📂 上传骚音乐</button>
+    <div class="music-song-name" id="musicSongName">还没放音乐</div>
+    <div class="music-progress-row">
+      <span class="music-time" id="musicCurrentTime">0:00</span>
+      <div class="music-progress-bg" id="musicProgressBg"><div class="music-progress-fill" id="musicProgressFill"></div></div>
+      <span class="music-time" id="musicDuration">0:00</span>
+    </div>
+    <div class="music-controls">
+      <div class="music-volume-row">
+        <span style="font-size:12px;color:#7a5a5a;">🔊</span>
+        <input type="range" id="musicVolume" min="0" max="1" step="0.01" value="1">
+      </div>
+      <button class="music-loop-btn" id="musicLoopBtn" type="button">🔁</button>
+    </div>
+    <button class="music-play-btn" id="musicPlayBtn" type="button">▶️</button>
+  </div>
+</div>
+<div class="toast" id="toast"></div>
+<div id="lightenRequest" class="hidden" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:99998;">
+  <div style="background:rgba(20,12,15,.98);border:1px solid #3f1f2a;border-radius:16px;padding:20px;max-width:320px;width:84%;box-shadow:0 0 40px rgba(120,0,20,.4);">
+    <div style="font-size:16px;font-weight:900;color:#b03a4a;text-align:center;margin-bottom:10px;">🙏 狗请求主人轻点</div>
+    <div id="lightenTaskText" style="font-size:13px;color:#d0b0b0;line-height:1.5;padding:10px;background:#1a0d10;border-radius:11px;margin-bottom:14px;word-break:break-word;"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+      <button id="lightenAllowBtn" class="command-btn" type="button" style="min-height:40px;font-size:13px;background:#1a3a1a;color:#8aca8a;border-color:#2a4a2a;">允许</button>
+      <button id="lightenDenyBtn" class="command-btn danger" type="button" style="min-height:40px;font-size:13px;">拒绝</button>
+    </div>
+  </div>
+</div>
+
+<div id="dogLightenPopup" class="hidden" style="position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);display:flex;align-items:center;justify-content:center;z-index:99997;">
+  <div style="background:rgba(20,12,15,.98);border:1px solid #3f1f2a;border-radius:16px;padding:20px;max-width:320px;width:84%;box-shadow:0 0 40px rgba(120,0,20,.4);text-align:center;">
+    <div id="dogLightenIcon" style="font-size:32px;margin-bottom:8px;">🙏</div>
+    <div id="dogLightenTitle" style="font-size:16px;font-weight:900;color:#b03a4a;margin-bottom:10px;">已请求主人轻点</div>
+    <div id="dogLightenText" style="font-size:13px;color:#d0b0b0;line-height:1.5;margin-bottom:14px;">等待主人回复中…</div>
+    <button id="dogLightenOkBtn" class="command-btn hidden" type="button" style="width:100%;min-height:40px;font-size:13px;">知道了</button>
+  </div>
+</div>
+
+<script>
+const TYPE_KEYWORDS={
+  bladder:["喝水","憋","尿","膀胱","压小腹","揉肚子","听水","排尿","虚阴","多憋","站立憋","尿意","尿急","尿裤子","漏尿"],
+  posture:["站立","跪","张腿","开腿","抱膝","俯卧","仰卧","盘腿","正坐","夹腿","M字","日式","大字","脚与肩","姿势","坐","爬","趴"],
+  punish:["抽","打","虐","惩罚","藤条","数据线","捶打","额外惩罚","掌掴","扇","鞭"],
+  sex:["高潮","乳","阴","奶头","性","自慰","插入","口","逼","鸡巴","射","摸","玩逼","玩鸡巴","夹子","跳蛋","震动"]
+};
+function detectType(text){
+  const t=(text||"").toLowerCase();
+  for(const [type,words] of Object.entries(TYPE_KEYWORDS)){if(words.some(w=>t.includes(w)))return type;}
+  return "bladder";
+}
+const TYPE_LABEL={bladder:"💧 尿",posture:"🧎 姿势",punish:"⚡ 惩罚",sex:"🔥 下体"};
+
+function detectIntensity(text){
+  const t=(text||"").toLowerCase();
+  const hard=["10分钟","15分钟","20分钟","狠","重","强制","额外","50次","30下","高潮","射","插入","漏尿","尿裤子"];
+  const mid=["5分钟","7分钟","8分钟","15次","20次","抽","打","虐"];
+  if(hard.some(w=>t.includes(w))) return 3;
+  if(mid.some(w=>t.includes(w))) return 2;
+  return 1;
+}
+
+let tasks=loadList("slave_tasks_v4"), finalTasks=loadList("slave_final_v4");
+let currentFilter="all", currentTemplate="all";
+function loadList(key){
+  try{const raw=localStorage.getItem(key);if(!raw)return[];const arr=JSON.parse(raw);if(!Array.isArray(arr))return[];
+    return arr.map(item=>{if(typeof item==="string")return{text:item.trim(),type:detectType(item)};if(item&&typeof item.text==="string")return{text:item.text.trim(),type:item.type||detectType(item.text)};return null;}).filter(Boolean);
+  }catch(e){return[];}
+}
+function saveList(key,list){try{localStorage.setItem(key,JSON.stringify(list));}catch(e){showToast('保存失败，存储空间可能已满');}}
+
+const $=id=>document.getElementById(id);
+let myRole="player",connected=false,roomId=null,onlineChannel=null,supabaseClient=null,supabaseReady=false;
+let state={difficulty:"easy",totalCells:40,position:0,feeling:1,lastDice:0,currentTask:null,currentTaskType:null,gameOver:false,rolling:false,punishmentPoints:0,punishmentThreshold:3,feedbackStatus:null,lastTaskIndex:-1,lastFinalIndex:-1};
+
+const SUPABASE_URL="https://yjfdfghryblkmneiyfbg.supabase.co";
+const SUPABASE_KEY="sb_publishable_sdYAgv7j6cI35XLyNoEecA_1hA5D6uk";
+function initSupabase(){if(!window.supabase?.createClient)return false;try{supabaseClient=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY,{auth:{persistSession:false,autoRefreshToken:false},realtime:{params:{eventsPerSecond:8}}});supabaseReady=true;return true;}catch(e){return false;}}
+window.addEventListener("supabase-sdk-ready",initSupabase);if(window.__supabaseLoaded)initSupabase();
+
+let toastTimer;
+function showToast(msg){const t=$("toast");t.textContent=msg;t.classList.add("show");clearTimeout(toastTimer);toastTimer=setTimeout(()=>t.classList.remove("show"),1800);}
+function playTone(freq,dur=.1){try{const ctx=window._actx||(window._actx=new(window.AudioContext||window.webkitAudioContext)());if(ctx.state==="suspended")ctx.resume();const o=ctx.createOscillator(),g=ctx.createGain();o.frequency.value=freq;o.type="triangle";g.gain.setValueAtTime(.04,ctx.currentTime);g.gain.exponentialRampToValueAtTime(.001,ctx.currentTime+dur);o.connect(g);g.connect(ctx.destination);o.start();o.stop(ctx.currentTime+dur);}catch(e){}}
+
+// 统一的点击音效
+function playClickSound(){
+  playTone(600, 0.06);
+}
+// 全局监听按钮点击播放音效
+document.addEventListener('click', function(e){
+  if (e.target.closest('button')) {
+    playClickSound();
+  }
+});
+
+function showLoading(msg){const ov=$("loadingOverlay");ov.classList.remove("hidden");if(msg)$("loadingText").textContent=msg;}
+function hideLoading(){const ov=$("loadingOverlay");ov.classList.add("hidden");}
+
+function getVisibleTasks(){let list=tasks;if(currentTemplate!=="all")list=list.filter(t=>t.type===currentTemplate);if(currentFilter!=="all")list=list.filter(t=>t.type===currentFilter);return list;}
+function renderTasks(){
+  const list=$("taskList"),visible=getVisibleTasks();
+  $("taskCount").textContent=tasks.length+" 条"+(visible.length!==tasks.length?`（显示${visible.length}）`:"");
+  list.innerHTML="";
+  if(!visible.length){list.innerHTML=`<div style="text-align:center;padding:16px;color:#7a5a5a;font-size:12px">还没有指令，快导入你的骚玩法</div>`;return;}
+  visible.forEach(item=>{
+    const realIndex=tasks.indexOf(item);
+    const el=document.createElement("div");el.className="task-item";
+    el.dataset.index = realIndex;
+    const idxSpan=document.createElement("div");idxSpan.className="task-index";idxSpan.textContent=realIndex+1;
+    const contentDiv=document.createElement("div");contentDiv.className="task-content";contentDiv.textContent=item.text;
+    const typeSpan=document.createElement("span");typeSpan.className="task-type "+item.type;typeSpan.textContent=TYPE_LABEL[item.type]||"💧 尿";
+    const delBtn=document.createElement("button");delBtn.className="task-delete";delBtn.type="button";delBtn.textContent="×";
+    delBtn.onclick=()=>{
+      const idx=parseInt(el.dataset.index);
+      tasks.splice(idx,1);
+      saveList("slave_tasks_v4",tasks);
+      renderTasks();
+      showToast("删掉了");
+    };
+    el.appendChild(idxSpan);el.appendChild(contentDiv);el.appendChild(typeSpan);el.appendChild(delBtn);
+    list.appendChild(el);
+  });
+}
+function renderFinalTasks(){
+  const list=$("finalTaskList");$("finalTaskCount").textContent=finalTasks.length+" 条";list.innerHTML="";
+  if(!finalTasks.length){list.innerHTML=`<div style="text-align:center;padding:16px;color:#7a5a5a;font-size:12px">还没有最终处置</div>`;return;}
+  finalTasks.forEach((item,i)=>{
+    const el=document.createElement("div");el.className="task-item";
+    el.dataset.index=i;
+    const idxSpan=document.createElement("div");idxSpan.className="task-index";idxSpan.textContent=i+1;
+    const contentDiv=document.createElement("div");contentDiv.className="task-content";contentDiv.textContent=item.text;
+    const typeSpan=document.createElement("span");typeSpan.className="task-type "+item.type;typeSpan.textContent=TYPE_LABEL[item.type]||"💧 尿";
+    const delBtn=document.createElement("button");delBtn.className="task-delete";delBtn.type="button";delBtn.textContent="×";
+    delBtn.onclick=()=>{
+      const idx=parseInt(el.dataset.index);
+      finalTasks.splice(idx,1);
+      saveList("slave_final_v4",finalTasks);
+      renderFinalTasks();
+      showToast("删掉了");
+    };
+    el.appendChild(idxSpan);el.appendChild(contentDiv);el.appendChild(typeSpan);el.appendChild(delBtn);
+    list.appendChild(el);
+  });
+}
+document.querySelectorAll("#taskTypeFilter .type-filter-btn").forEach(btn=>{btn.onclick=()=>{document.querySelectorAll("#taskTypeFilter .type-filter-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");currentFilter=btn.dataset.type;renderTasks();};});
+document.querySelectorAll("#templateList .template-btn").forEach(btn=>{btn.onclick=()=>{document.querySelectorAll("#templateList .template-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");currentTemplate=btn.dataset.template;currentFilter=currentTemplate==="all"?"all":currentTemplate;document.querySelectorAll("#taskTypeFilter .type-filter-btn").forEach(b=>b.classList.toggle("active",b.dataset.type===currentFilter));renderTasks();showToast(btn.textContent.trim());};});
+
+function parseImportText(text){if(text.trim().startsWith("[")||text.trim().startsWith("{")){try{const data=JSON.parse(text);const arr=Array.isArray(data)?data:(data.tasks||[]);return arr.map(item=>{const str=typeof item==="string"?item:(item.task||item.text||"");return str.trim();}).filter(Boolean);}catch(e){}}return text.split(/\r?\n/).map(l=>l.trim()).filter(l=>l.length>0);}
+function importTasks(file,isFinal=false){
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const rawList=parseImportText(e.target.result);if(!rawList.length){showToast("没读到任何指令");return;}
+    const targetList = isFinal ? finalTasks : tasks;
+    const existingTexts = new Set(targetList.map(item => item.text));
+    const seenInFile = new Set();
+    const newTexts = [];
+    let fileDuplicates = 0, existingDuplicates = 0;
+    rawList.forEach(text => {
+      if (seenInFile.has(text)) { fileDuplicates++; return; }
+      seenInFile.add(text);
+      if (existingTexts.has(text)) { existingDuplicates++; return; }
+      newTexts.push(text);
+    });
+    if (!newTexts.length) { showToast("没有新的指令可导入（全部重复）"); return; }
+    const newItems = newTexts.map(text => ({ text, type: detectType(text) }));
+    if (isFinal) { finalTasks.push(...newItems); saveList("slave_final_v4",finalTasks); renderFinalTasks(); }
+    else { tasks.push(...newItems); saveList("slave_tasks_v4",tasks); renderTasks(); }
+    const count = {};
+    newItems.forEach(i => count[i.type] = (count[i.type] || 0) + 1);
+    const typeSummary = Object.entries(count).map(([k,v])=>`${TYPE_LABEL[k]}×${v}`).join(" ");
+    let msg = `塞进来 ${newItems.length} 条\n${typeSummary}`;
+    if (fileDuplicates > 0 || existingDuplicates > 0) msg += `\n忽略重复：文件内 ${fileDuplicates} 条，已存在 ${existingDuplicates} 条`;
+    showToast(msg);
+    playTone(660,0.12);
+  };
+  reader.readAsText(file);
+}
+$("importTaskBtn").onclick=()=>{$("taskFile").value="";$("taskFile").click();};
+$("importFinalTaskBtn").onclick=()=>{$("finalTaskFile").value="";$("finalTaskFile").click();};
+$("taskFile").onchange=e=>{if(e.target.files[0])importTasks(e.target.files[0],false);};
+$("finalTaskFile").onchange=e=>{if(e.target.files[0])importTasks(e.target.files[0],true);};
+$("clearTaskBtn").onclick=()=>{if(!tasks.length)return;if(!confirm("真的清空？"))return;tasks=[];saveList("slave_tasks_v4",tasks);renderTasks();showToast("清干净了");};
+$("clearFinalTaskBtn").onclick=()=>{if(!finalTasks.length)return;if(!confirm("清空最终处置？"))return;finalTasks=[];saveList("slave_final_v4",finalTasks);renderFinalTasks();showToast("清干净了");};
+
+function renderBoard(){
+  const board=$("boardVisual");
+  board.innerHTML="";
+  const max=state.totalCells; // 使用全部格子数，不再限制48
+  for(let i=0;i<max;i++){
+    const c=document.createElement("div");
+    c.className="board-cell";
+    if(i<state.position) c.classList.add("passed");
+    if(i===state.position) c.classList.add("current");
+    board.appendChild(c);
+  }
+}
+function updateGameUI(){
+  const isSpec=myRole==="spectator";
+  $("progressCard").classList.toggle("hidden",isSpec);$("diceCard").classList.toggle("hidden",isSpec);
+  const locked=!$("gamePage").classList.contains("hidden")&&!state.gameOver;
+  $("playerRoleBtn").classList.toggle("locked",locked);$("spectatorRoleBtn").classList.toggle("locked",locked);
+  const pct=Math.min(100,Math.round(state.position/state.totalCells*100));
+  $("progressText").textContent=pct+"%";$("progressFill").style.width=pct+"%";
+  $("punishmentDisplay").textContent=`${state.punishmentPoints} / ${state.punishmentThreshold}`;
+  $("punishmentBar").classList.toggle("locked",state.currentTaskType==="force_punish");
+  renderBoard();
+  const btn=$("rollBtn");
+  btn.disabled=!!state.currentTask||state.gameOver||state.rolling||isSpec;
+  if(isSpec)btn.textContent="👑 主人正在看";
+  else if(state.currentTaskType==="force_punish")btn.textContent="必须先完成强制惩罚";
+  else if(state.currentTask)btn.textContent="先处理当前命令";
+  else if(state.gameOver)btn.textContent="已经玩完了";
+  else btn.textContent="🎲 求主人掷骰";
+}
+function createFeelingButtons(){
+  const box=$("feelingButtons");box.innerHTML="";
+  for(let i=1;i<=10;i++){const b=document.createElement("button");b.type="button";b.className="feeling-btn"+(i===state.feeling?" active":"");b.textContent=i;
+    b.onclick=()=>{if(myRole!=="player")return;state.feeling=i;createFeelingButtons();updateGameUI();sendGameState();};box.appendChild(b);}
+}
+
+function pickTask(list,lastKey){if(!list.length)return null;if(list.length===1){state[lastKey]=0;return list[0];}let idx;do{idx=Math.floor(Math.random()*list.length);}while(idx===state[lastKey]&&list.length>1);state[lastKey]=idx;return list[idx];}
+function showEvent(taskObj,isFinal){
+  $("eventCard").classList.remove("hidden");
+  $("eventIcon").textContent=isFinal?"🩸":"⚠️";
+  $("eventTitle").textContent=isFinal?"最终处置！":"主人的命令到了";
+  $("eventText").textContent=taskObj.text;
+  $("eventMeta").textContent=isFinal ? "执行完才能解脱" : "";
+  $("fbAbandon").classList.remove("hidden");
+  $("fbLighten").classList.remove("hidden");
+  state.feedbackStatus=null;updateGameUI();
+}
+function forcePunishmentTask(){
+  const punishCandidates=tasks.filter(t=>t.type==="punish");
+  const pTask=punishCandidates.length
+    ? punishCandidates[Math.floor(Math.random()*punishCandidates.length)]
+    : {text:"强制惩罚：保持羞耻姿势 3 分钟，不许动", type:"punish"};
+  state.currentTask=pTask;
+  state.currentTaskType="force_punish";
+  $("eventCard").classList.remove("hidden");
+  $("eventIcon").textContent="⚡";
+  $("eventTitle").textContent="强制惩罚！";
+  $("eventText").textContent=pTask.text;
+  $("eventMeta").textContent="惩罚债已满 · 必须完成才能继续";
+  $("fbAbandon").classList.add("hidden");
+  $("fbLighten").classList.add("hidden");
+  showToast("惩罚债已满，必须先完成强制惩罚");
+  updateGameUI();
+  sendGameState();
+}
+
+function rollDice(){
+  if(state.gameOver||state.currentTask||state.rolling||myRole!=="player")return;
+  if(state.position>=state.totalCells){finishGame();return;}
+  if(!tasks.length){showToast("先导入日常玩弄指令");return;}
+  if(!finalTasks.length){showToast("先导入最终处置指令");return;}
+  state.rolling=true;updateGameUI();playTone(360,.08);
+  $("dice").classList.remove("rolling");void $("dice").offsetWidth;$("dice").classList.add("rolling");
+  $("diceResult").textContent="命运正在决定你……";
+  setTimeout(()=>{
+    const num=Math.floor(Math.random()*6)+1;state.lastDice=num;
+    $("dice").textContent=["","⚀","⚁","⚂","⚃","⚄","⚅"][num];
+    $("diceResult").textContent=`主人掷出了 ${num} 步`;
+    state.position=Math.min(state.position+num,state.totalCells);state.rolling=false;
+    if(state.position>=state.totalCells){const ft=pickTask(finalTasks,"lastFinalIndex");if(ft){state.currentTask=ft;state.currentTaskType="final";showEvent(ft,true);}sendGameState();return;}
+    let pool=tasks;
+    if(currentTemplate!=="all") pool=tasks.filter(t=>t.type===currentTemplate);
+    if(!pool.length) pool=tasks;
+    const want = state.difficulty==="easy" ? 1 : state.difficulty==="hard" ? 3 : 2;
+    let filtered = pool.filter(t => detectIntensity(t.text) === want);
+    if(!filtered.length){
+      if(want===1) filtered = pool.filter(t => detectIntensity(t.text) <= 2);
+      else if(want===3) filtered = pool.filter(t => detectIntensity(t.text) >= 2);
+      else filtered = pool;
+    }
+    if(!filtered.length) filtered = pool;
+    const t=pickTask(filtered,"lastTaskIndex");
+    if(t){state.currentTask=t;state.currentTaskType="normal";showEvent(t,false);}
+    updateGameUI();sendGameState();
+  },420);
+}
+$("rollBtn").onclick=rollDice;
+
+function handleFeedback(type){
+  if(!state.currentTask)return;
+  state.feedbackStatus=type;
+
+  if(state.currentTaskType==="force_punish"){
+    if(type!=="done"){
+      showToast("强制惩罚必须完成，不能逃避");
+      return;
+    }
+    state.punishmentPoints=0;
+    state.currentTask=null;
+    state.currentTaskType=null;
+    $("eventCard").classList.add("hidden");
+    $("fbAbandon").classList.remove("hidden");
+    $("fbLighten").classList.remove("hidden");
+    showToast("强制惩罚完成，惩罚债已清零，可以继续了");
+    playTone(620,.12);
+    updateGameUI();
+    sendGameState();
+    return;
+  }
+
+  if(type==="done"){
+    showToast("狗很乖，执行完了");
+    playTone(620,.1);
+  }
+  else if(type==="abandon"){
+    if(state.currentTaskType==="final"){
+      showToast("最终处置不可违抗，必须完成！");
+      return;
+    }
+    state.punishmentPoints++;
+    showToast(`敢违抗？惩罚债 +1（${state.punishmentPoints}/${state.punishmentThreshold}）`);
+    playTone(220,.14);
+    if(state.punishmentPoints>=state.punishmentThreshold){
+      forcePunishmentTask();
+      return;
+    }
+  }
+  else if(type==="lighten"){
+    if(state.currentTaskType==="final"){showToast("最终处置不可请求轻点");return;}
+    state.feedbackStatus="lighten";
+    showToast("已向主人请求轻点，等待回复");
+    playTone(480,.1);
+    $("dogLightenIcon").textContent="🙏";
+    $("dogLightenTitle").textContent="已请求主人轻点";
+    $("dogLightenText").textContent="等待主人回复中…";
+    $("dogLightenOkBtn").classList.add("hidden");
+    $("dogLightenPopup").classList.remove("hidden");
+    sendGameState();
+    return;
+  }
+
+  const wasFinal=state.currentTaskType==="final";
+  state.currentTask=null;
+  state.currentTaskType=null;
+  $("eventCard").classList.add("hidden");
+  if(wasFinal)finishGame();
+  updateGameUI();
+  sendGameState();
+}
+$("fbDone").onclick=()=>handleFeedback("done");
+$("fbAbandon").onclick=()=>handleFeedback("abandon");
+$("fbLighten").onclick=()=>handleFeedback("lighten");
+
+function finishGame(){
+  state.gameOver=true;state.currentTask=null;$("eventCard").classList.add("hidden");$("gameOver").classList.remove("hidden");
+  $("gameOverTitle").textContent="狗已经走完全程";$("gameOverText").textContent="但项圈永远不会解开";
+  $("diceResult").textContent="这条狗已经走完全程";updateGameUI();sendGameState();
+}
+
+$("startBtn").onclick=()=>{
+  if(myRole==="spectator"){$("startPage").classList.add("hidden");$("gamePage").classList.remove("hidden");$("spectatorCard").classList.remove("hidden");$("commandCard").classList.remove("hidden");$("chatCard").classList.remove("hidden");$("videoCard").classList.remove("hidden");$("remoteVideoWrap").classList.remove("hidden");$("localVideoWrap").classList.add("hidden");$("requestVideoBtn").classList.remove("hidden");$("cameraOnBtn").classList.add("hidden");updateGameUI();showToast("主人模式开启");return;}
+  if(!tasks.length){showToast("先导入日常玩弄指令再开始");return;}
+  if(!finalTasks.length){showToast("先导入最终处置指令再开始");return;}
+  const len=Math.max(1,Math.min(999,parseInt($("lengthInput").value)||40));state.totalCells=len;$("lengthInput").value=len;
+  state.position=0;state.feeling=1;state.lastDice=0;state.currentTask=null;state.gameOver=false;state.rolling=false;state.punishmentPoints=0;state.feedbackStatus=null;
+  state.lastTaskIndex=-1;state.lastFinalIndex=-1;
+  $("startPage").classList.add("hidden");$("gamePage").classList.remove("hidden");$("gameOver").classList.add("hidden");$("eventCard").classList.add("hidden");
+  $("videoCard").classList.remove("hidden");$("localVideoWrap").classList.remove("hidden");$("remoteVideoWrap").classList.add("hidden");$("cameraOnBtn").classList.remove("hidden");$("requestVideoBtn").classList.add("hidden");
+  $("dice").textContent="🎲";$("diceResult").textContent="准备好被决定命运了吗？";createFeelingButtons();updateGameUI();sendGameState();showToast("狗已经上锁，开始吧");playTone(520,.1);
+};
+function restart(){if(!tasks.length||!finalTasks.length){showToast("指令库是空的");return;}state.position=0;state.feeling=1;state.currentTask=null;state.gameOver=false;state.punishmentPoints=0;state.lastTaskIndex=-1;state.lastFinalIndex=-1;$("eventCard").classList.add("hidden");$("gameOver").classList.add("hidden");$("dice").textContent="🎲";createFeelingButtons();updateGameUI();sendGameState();showToast("重新开始玩这条狗");}
+$("restartBtn").onclick=restart;$("newGameBtn").onclick=restart;
+$("backBtn").onclick=()=>{state.currentTask=null;state.gameOver=false;$("startPage").classList.remove("hidden");$("gamePage").classList.add("hidden");updateGameUI();sendGameState();};
+
+document.querySelectorAll(".difficulty").forEach(btn=>{btn.onclick=()=>{document.querySelectorAll(".difficulty").forEach(b=>b.classList.remove("active"));btn.classList.add("active");const d=btn.dataset.difficulty;state.difficulty=d;state.totalCells=d==="easy"?40:d==="normal"?50:60;$("lengthInput").value=state.totalCells;};});
+$("lengthMinus").onclick=()=>{let v=Math.max(1,(parseInt($("lengthInput").value)||40)-1);$("lengthInput").value=v;state.totalCells=v;};
+$("lengthPlus").onclick=()=>{let v=Math.min(999,(parseInt($("lengthInput").value)||40)+1);$("lengthInput").value=v;state.totalCells=v;};
+
+async function sendGameState(){if(!connected||!onlineChannel||myRole!=="player")return;try{await onlineChannel.send({type:"broadcast",event:"game_state",payload:{position:state.position,feeling:state.feeling,lastDice:state.lastDice,currentTask:state.currentTask?state.currentTask.text:null,currentTaskType:state.currentTaskType,taskTypeLabel:state.currentTask?(TYPE_LABEL[state.currentTask.type]||""):"",gameOver:state.gameOver,punishmentPoints:state.punishmentPoints,feedbackStatus:state.feedbackStatus,timestamp:Date.now()}});}catch(e){}}
+function applyRemoteState(data){if(!data)return;$("remotePosition").textContent=data.position??0;$("remoteDice").textContent=data.lastDice||"-";$("remoteFeeling").textContent=data.feeling??1;$("remotePunishment").textContent=data.punishmentPoints??0;let status="空闲";if(data.gameOver)status="⛓️ 已经终止";else if(data.feedbackStatus==="lighten")status=`🙏 求轻点：${data.currentTask||""}`;else if(data.feedbackStatus==="abandon")status=`❌ 违抗了：${data.currentTask||""}`;else if(data.feedbackStatus==="done")status=`✅ 执行完：${data.currentTask||""}`;else if(data.currentTask)status=`${data.taskTypeLabel||""} ${data.currentTask}`;$("remoteStatus").textContent=status;$("spectatorCard").classList.remove("hidden");const lightenBox=$("lightenRequest");if(data.feedbackStatus==="lighten"&&data.currentTask){$("lightenTaskText").textContent=data.currentTask;lightenBox.classList.remove("hidden");}else{lightenBox.classList.add("hidden");}const feelingBox=$("feelingButtons");if(feelingBox){if(!feelingBox.children.length){for(let i=1;i<=10;i++){const b=document.createElement("button");b.type="button";b.className="feeling-btn";b.textContent=i;b.style.pointerEvents="none";feelingBox.appendChild(b);}}Array.from(feelingBox.children).forEach((b,i)=>{b.classList.toggle("active",(i+1)===data.feeling);});}}
+
+async function connectRoomWithRetry(room, maxRetries=3){
+  let lastError;
+  for(let attempt=1; attempt<=maxRetries; attempt++){
+    try{
+      showLoading(`正在连接房间 (尝试 ${attempt}/${maxRetries})...`);
+      await connectRoom(room);
+      hideLoading();
+      return;
+    }catch(err){
+      lastError=err;
+      console.warn(`连接失败 (尝试 ${attempt}/${maxRetries})`, err);
+      if(attempt < maxRetries){
+        const delay = 1000 * Math.pow(2, attempt-1);
+        await new Promise(r=>setTimeout(r, delay));
+      }
+    }
+  }
+  hideLoading();
+  $("onlineStatus").textContent="⛓️ 上锁失败（重试耗尽）";
+  showToast("连接失败，请检查网络或房间号");
+  throw lastError;
+}
+
+async function connectRoom(room){
+  if(!supabaseReady&&!initSupabase()){$("onlineStatus").textContent="🔴 连不上";showToast("网络模块没好");return Promise.reject(new Error("Supabase not ready"));}
+  try{
+    if(onlineChannel)await supabaseClient.removeChannel(onlineChannel);
+    roomId=String(room).trim();$("onlineStatus").textContent="正在上锁…";$("onlineStatus").classList.remove("connected");
+    onlineChannel=supabaseClient.channel("slave-room-"+roomId,{config:{broadcast:{ack:true},presence:{key:crypto.randomUUID?.()||Date.now()+""}}});
+    onlineChannel.on("broadcast",{event:"game_state"},({payload})=>{if(myRole==="spectator")applyRemoteState(payload);});
+    onlineChannel.on("broadcast",{event:"command"},({payload})=>{if(myRole==="player")receiveCommand(payload);});
+    onlineChannel.on("broadcast",{event:"chat"},({payload})=>{if(payload?.message)appendChat(payload.role||"player",payload.message,payload.type||"text",payload.duration);});
+    onlineChannel.on("broadcast",{event:"lighten_allow"},({payload})=>{if(myRole==="player")handleLightenAllow();});
+    onlineChannel.on("broadcast",{event:"lighten_deny"},({payload})=>{if(myRole==="player")handleLightenDeny();});
+    // WebRTC信令监听
+    onlineChannel.on("broadcast",{event:"webrtc_offer"}, async ({payload})=>{
+      await handleOffer(payload);
+    });
+    onlineChannel.on("broadcast",{event:"webrtc_answer"}, async ({payload})=>{
+      await handleAnswer(payload);
+    });
+    onlineChannel.on("broadcast",{event:"webrtc_ice"}, async ({payload})=>{
+      await handleICE(payload);
+    });
+    onlineChannel.on("broadcast",{event:"webrtc_end_call"}, async ()=>{
+      endCall(false);
+    });
+    onlineChannel.on("broadcast",{event:"video_request"},({payload})=>{handleVideoRequest();});
+    onlineChannel.on("broadcast",{event:"video_allow"},({payload})=>{handleVideoAllow();});
+    onlineChannel.on("broadcast",{event:"video_deny"},({payload})=>{handleVideoDeny();});
+    onlineChannel.on("broadcast",{event:"video_end"},({payload})=>{handleVideoEnd();});
+    onlineChannel.on("broadcast",{event:"video_permission_denied"},({payload})=>{handleVideoPermissionDenied();});
+    await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(new Error("timeout")),10000);onlineChannel.subscribe(status=>{if(status==="SUBSCRIBED"){clearTimeout(timer);connected=true;resolve();}if(status==="CHANNEL_ERROR"||status==="TIMED_OUT"){clearTimeout(timer);reject(new Error(status));}});});
+    $("onlineStatus").textContent="⛓️ 已上锁 · "+roomId;$("onlineStatus").classList.add("connected");
+    $("roomCode").textContent="房间号："+roomId;$("roomCode").classList.remove("hidden");
+    $("chatCard").classList.remove("hidden");
+    if(myRole==="spectator"){$("commandCard").classList.remove("hidden");$("spectatorCard").classList.remove("hidden");if(!$("gamePage").classList.contains("hidden")){$("videoCard").classList.remove("hidden");$("remoteVideoWrap").classList.remove("hidden");$("localVideoWrap").classList.add("hidden");$("requestVideoBtn").classList.remove("hidden");$("cameraOnBtn").classList.add("hidden");}}else sendGameState();
+    $("leaveRoomBtn").classList.remove("hidden");
+    showToast("锁好了");
+    return Promise.resolve();
+  }catch(e){
+    connected=false;$("onlineStatus").textContent="⛓️ 上锁失败";showToast("连接失败");
+    $("leaveRoomBtn").classList.add("hidden");
+    return Promise.reject(e);
+  }
+}
+
+async function leaveRoom(){
+  if(!connected || !onlineChannel) {
+    showToast("没有房间可退出");
+    return;
+  }
+  // 挂断通话
+  if(callActive) endCall(true);
+  try{
+    await supabaseClient.removeChannel(onlineChannel);
+  }catch(e){}
+  connected=false;
+  onlineChannel=null;
+  roomId=null;
+  $("onlineStatus").textContent="还没被锁进房间";
+  $("onlineStatus").classList.remove("connected");
+  $("roomCode").classList.add("hidden");
+  $("leaveRoomBtn").classList.add("hidden");
+  $("chatCard").classList.add("hidden");
+  $("commandCard").classList.add("hidden");
+  $("spectatorCard").classList.add("hidden");
+  $("videoCard").classList.add("hidden");
+  if(!$("gamePage").classList.contains("hidden")){
+    $("gamePage").classList.add("hidden");
+    $("startPage").classList.remove("hidden");
+  }
+  showToast("已退出房间");
+}
+
+$("createRoomBtn").onclick=()=>{const id=String(Math.floor(100000+Math.random()*900000));$("roomInput").value=id;connectRoomWithRetry(id);};
+$("joinRoomBtn").onclick=()=>{const r=$("roomInput").value.trim();if(!r)return showToast("先输入房间号");connectRoomWithRetry(r);};
+$("leaveRoomBtn").onclick=leaveRoom;
+
+$("playerRoleBtn").onclick=()=>{
+  if(!$("gamePage").classList.contains("hidden")&&!state.gameOver)return showToast("调教中不能换身份");
+  myRole="player";
+  $("playerRoleBtn").classList.add("active");$("spectatorRoleBtn").classList.remove("active");
+  $("commandCard").classList.add("hidden");$("spectatorCard").classList.add("hidden");
+  if(!$("gamePage").classList.contains("hidden")){$("videoCard").classList.remove("hidden");$("localVideoWrap").classList.remove("hidden");$("remoteVideoWrap").classList.add("hidden");$("cameraOnBtn").classList.remove("hidden");$("requestVideoBtn").classList.add("hidden");}
+  updateGameUI();
+  if(connected)sendGameState();
+  showToast("你现在是狗");
+};
+$("spectatorRoleBtn").onclick=()=>{
+  if(!$("gamePage").classList.contains("hidden")&&!state.gameOver)return showToast("调教中不能换身份");
+  myRole="spectator";
+  $("spectatorRoleBtn").classList.add("active");$("playerRoleBtn").classList.remove("active");
+  if(connected){
+    $("commandCard").classList.remove("hidden");
+    $("spectatorCard").classList.remove("hidden");
+    if(!$("gamePage").classList.contains("hidden")){$("videoCard").classList.remove("hidden");$("remoteVideoWrap").classList.remove("hidden");$("localVideoWrap").classList.add("hidden");$("requestVideoBtn").classList.remove("hidden");$("cameraOnBtn").classList.add("hidden");}
+  }
+  updateGameUI();
+  showToast("你现在是主人");
+};
+function receiveCommand(data){if(!data||state.gameOver)return;const cmd=String(data.command||"").trim();if(!cmd)return;const obj={text:cmd,type:detectType(cmd)};state.currentTask=obj;state.currentTaskType="command";state.feedbackStatus=null;showEvent(obj,false);$("eventTitle").textContent="主人直接下令了";showToast("收到主人命令");updateGameUI();sendGameState();}
+$("sendCommandBtn").onclick=async()=>{if(myRole!=="spectator"||!connected)return showToast("只有主人能下命令");const cmd=$("commandInput").value.trim();if(!cmd)return;try{await onlineChannel.send({type:"broadcast",event:"command",payload:{command:cmd,timestamp:Date.now()}});$("commandInput").value="";const log=$("commandLog");if(log.textContent.includes("还没有"))log.innerHTML='';const div=document.createElement('div');div.textContent='📣 '+cmd;log.appendChild(div);showToast("命令已下达");}catch(e){showToast("发送失败");}};
+$("clearCommandBtn").onclick=()=>{$("commandInput").value="";};
+function handleLightenAllow(){
+  if(!state.currentTask)return;
+  if(state.currentTaskType==="force_punish"||state.currentTaskType==="final")return;
+  showToast("主人同意轻点，任务结束");
+  playTone(480,.1);
+  $("dogLightenIcon").textContent="✅";
+  $("dogLightenTitle").textContent="主人已允许轻点";
+  $("dogLightenText").textContent="当前任务已结束，新任务已生成";
+  $("dogLightenOkBtn").classList.remove("hidden");
+  state.currentTask=null;
+  state.currentTaskType=null;
+  state.feedbackStatus=null;
+  $("eventCard").classList.add("hidden");
+  $("fbAbandon").classList.remove("hidden");
+  $("fbLighten").classList.remove("hidden");
+  updateGameUI();
+  sendGameState();
+  if(state.gameOver||state.position>=state.totalCells)return;
+  if(!tasks.length)return;
+  let pool=tasks;
+  if(currentTemplate!=="all")pool=tasks.filter(t=>t.type===currentTemplate);
+  if(!pool.length)pool=tasks;
+  const want=state.difficulty==="easy"?1:state.difficulty==="hard"?3:2;
+  let filtered=pool.filter(t=>detectIntensity(t.text)===want);
+  if(!filtered.length){if(want===1)filtered=pool.filter(t=>detectIntensity(t.text)<=2);else if(want===3)filtered=pool.filter(t=>detectIntensity(t.text)>=2);else filtered=pool;}
+  if(!filtered.length)filtered=pool;
+  const t=pickTask(filtered,"lastTaskIndex");
+  if(t){state.currentTask=t;state.currentTaskType="normal";showEvent(t,false);}
+  updateGameUI();sendGameState();
+}
+function handleLightenDeny(){
+  if(!state.currentTask)return;
+  state.feedbackStatus=null;
+  showToast("主人拒绝了轻点，继续执行");
+  $("dogLightenIcon").textContent="❌";
+  $("dogLightenTitle").textContent="主人拒绝了轻点";
+  $("dogLightenText").textContent="继续执行当前任务";
+  $("dogLightenOkBtn").classList.remove("hidden");
+  updateGameUI();
+  sendGameState();
+}
+$("lightenAllowBtn").onclick=async()=>{if(!connected)return;try{await onlineChannel.send({type:"broadcast",event:"lighten_allow",payload:{timestamp:Date.now()}});$("lightenRequest").classList.add("hidden");showToast("已允许轻点");}catch(e){}};
+$("lightenDenyBtn").onclick=async()=>{if(!connected)return;try{await onlineChannel.send({type:"broadcast",event:"lighten_deny",payload:{timestamp:Date.now()}});$("lightenRequest").classList.add("hidden");showToast("已拒绝轻点");}catch(e){}};
+$("dogLightenOkBtn").onclick=()=>{$("dogLightenPopup").classList.add("hidden");};
+
+// 聊天文本
+function appendChat(role,message,type="text",duration=0){
+  const log=$("chatLog");if(log.querySelector(".chat-empty"))log.innerHTML="";
+  const div=document.createElement("div");div.className="chat-message "+(role===myRole?"me":"other");
+  const name=document.createElement("div");name.className="chat-name";name.textContent=role==="player"?"🐕 狗":"👑 主人";
+  const bubble=document.createElement("div");bubble.className="chat-bubble";
+  bubble.textContent=message; // 仅文本，不再处理语音消息
+  div.appendChild(name);div.appendChild(bubble);log.appendChild(div);log.scrollTop=log.scrollHeight;
+}
+$("sendChatBtn").onclick=async()=>{
+  if(!connected)return showToast("先进入房间");
+  const msg=$("chatInput").value.trim();if(!msg)return;
+  try{await onlineChannel.send({type:"broadcast",event:"chat",payload:{role:myRole,message:msg,type:"text",timestamp:Date.now()}});appendChat(myRole,msg);$("chatInput").value="";}catch(e){}
+};
+$("chatInput").addEventListener("keydown",e=>{if(e.key==="Enter")$("sendChatBtn").click();});
+
+// ========== WebRTC 语音通话 ==========
+let localStream = null;
+let pc = null;
+let remoteAudio = null;
+let callActive = false;
+let isCaller = false;
+let localVideoStream = null;
+let cameraActive = false;
+let negotiating = false;
+let videoState = "idle";
+
+const rtcConfig = {
+  iceServers: [
+    { urls: 'stun:stun.l.google.com:19302' }
+    // 如需TURN请添加
+  ]
+};
+
+// 初始化通话按钮事件
+$("callBtn").onclick = async () => {
+  if (!connected) {
+    showToast("先进入房间才能通话");
+    return;
+  }
+  if (callActive) {
+    // 挂断
+    endCall(true);
+    return;
+  }
+  // 开始呼叫
+  await startCall();
+};
+
+async function startCall() {
+  try {
+    // 获取本地麦克风
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // 创建 PeerConnection（如果已有则复用，避免覆盖视频轨道）
+    if (!pc) {
+      pc = new RTCPeerConnection(rtcConfig);
+      // 监听远程流
+      pc.ontrack = (event) => {
+        if (event.track.kind === 'video') {
+          if (myRole === 'spectator') {
+            const rv = $("remoteVideo");
+            if (rv) {
+              rv.srcObject = event.streams[0];
+              rv.play().catch(e=>console.warn("播放远程视频失败",e));
+              $("videoStatus").textContent = "正在观看狗";
+            }
+            event.track.onended = () => {
+              $("videoStatus").textContent = "摄像头已关闭";
+              const r = $("remoteVideo");
+              if (r) r.srcObject = null;
+            };
+          }
+        } else {
+          if (!remoteAudio) {
+            remoteAudio = new Audio();
+            remoteAudio.autoplay = true;
+          }
+          remoteAudio.srcObject = event.streams[0];
+          remoteAudio.play().catch(e => console.warn("播放远程音频失败", e));
+        }
+      };
+      // 监听重新协商
+      pc.onnegotiationneeded = async () => {
+        if (negotiating || !pc) return;
+        try {
+          negotiating = true;
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+          await onlineChannel.send({type:'broadcast',event:'webrtc_offer',payload:{sdp:offer}});
+        } catch(e) { console.warn("重新协商失败", e); }
+        finally { negotiating = false; }
+      };
+      // 监听 ICE 候选
+      pc.onicecandidate = ({ candidate }) => {
+        if (candidate && onlineChannel) {
+          onlineChannel.send({
+            type: 'broadcast',
+            event: 'webrtc_ice',
+            payload: { candidate }
+          }).catch(e => console.warn("发送ICE失败", e));
+        }
+      };
+      isCaller = true;
+    }
+    // 添加本地音频轨道
+    localStream.getTracks().forEach(track => {
+      if (!pc.getSenders().find(s => s.track === track)) {
+        pc.addTrack(track, localStream);
+      }
+    });
+    // 新创建的pc需要主动创建offer；复用的pc由onnegotiationneeded自动触发
+    if (isCaller && !pc.localDescription) {
+      const offer = await pc.createOffer();
+      await pc.setLocalDescription(offer);
+      await onlineChannel.send({
+        type: 'broadcast',
+        event: 'webrtc_offer',
+        payload: { sdp: offer }
+      });
+    }
+    callActive = true;
+    updateCallUI();
+    showToast("正在呼叫...");
+  } catch (e) {
+    console.error("启动通话失败", e);
+    showToast("无法启动通话，请检查麦克风权限");
+    cleanupCall();
+  }
+}
+
+async function handleOffer(payload) {
+  if (callActive && pc) {
+    try {
+      negotiating = true;
+      await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      await onlineChannel.send({type:'broadcast',event:'webrtc_answer',payload:{sdp:answer}});
+    } catch(e) { console.warn("重新协商失败", e); }
+    finally { negotiating = false; }
+    return;
+  }
+  if (callActive) return;
+  try {
+    // 获取本地麦克风
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true });
+    // 创建 PeerConnection
+    pc = new RTCPeerConnection(rtcConfig);
+    localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+    pc.ontrack = (event) => {
+      if (event.track.kind === 'video') {
+        if (myRole === 'spectator') {
+          const rv = $("remoteVideo");
+          if (rv) {
+            rv.srcObject = event.streams[0];
+            rv.play().catch(e=>console.warn("播放远程视频失败",e));
+            $("videoStatus").textContent = "正在观看狗";
+          }
+        }
+      } else {
+        if (!remoteAudio) {
+          remoteAudio = new Audio();
+          remoteAudio.autoplay = true;
+        }
+        remoteAudio.srcObject = event.streams[0];
+        remoteAudio.play().catch(e => console.warn("播放远程音频失败", e));
+      }
+    };
+    pc.onnegotiationneeded = async () => {
+      if (negotiating || !pc) return;
+      try {
+        negotiating = true;
+        const offer = await pc.createOffer();
+        await pc.setLocalDescription(offer);
+        await onlineChannel.send({type:'broadcast',event:'webrtc_offer',payload:{sdp:offer}});
+      } catch(e) { console.warn("重新协商失败", e); }
+      finally { negotiating = false; }
+    };
+    pc.onicecandidate = ({ candidate }) => {
+      if (candidate && onlineChannel) {
+        onlineChannel.send({
+          type: 'broadcast',
+          event: 'webrtc_ice',
+          payload: { candidate }
+        }).catch(e => console.warn("发送ICE失败", e));
+      }
+    };
+    // 设置远程 offer
+    await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));
+    // 创建 answer
+    const answer = await pc.createAnswer();
+    await pc.setLocalDescription(answer);
+    // 发送 answer
+    await onlineChannel.send({
+      type: 'broadcast',
+      event: 'webrtc_answer',
+      payload: { sdp: answer }
+    });
+    isCaller = false;
+    callActive = true;
+    updateCallUI();
+    showToast("已接听通话");
+  } catch (e) {
+    console.error("处理offer失败", e);
+    showToast("无法接听通话");
+    cleanupCall();
+  }
+}
+
+async function handleAnswer(payload) {
+  if (!pc || !callActive) return;
+  try {
+    await pc.setRemoteDescription(new RTCSessionDescription(payload.sdp));
+    showToast("通话已连接");
+    updateCallUI();
+  } catch (e) {
+    console.error("处理answer失败", e);
+    showToast("连接失败");
+    endCall(true);
+  }
+}
+
+async function handleICE(payload) {
+  if (!pc || !payload || !payload.candidate) return;
+  try {
+    await pc.addIceCandidate(new RTCIceCandidate(payload.candidate));
+  } catch (e) {
+    console.warn("添加ICE失败", e);
+  }
+}
+
+function endCall(sendSignal) {
+  // 关闭 PeerConnection
+  if (pc) {
+    pc.onicecandidate = null;
+    pc.ontrack = null;
+    pc.onnegotiationneeded = null;
+    pc.close();
+    pc = null;
+  }
+  // 停止本地流
+  if (localStream) {
+    localStream.getTracks().forEach(track => track.stop());
+    localStream = null;
+  }
+  // 停止本地视频
+  if (localVideoStream) {
+    localVideoStream.getTracks().forEach(track => track.stop());
+    localVideoStream = null;
+  }
+  cameraActive = false;
+  const lv = $("localVideo");
+  if (lv) lv.srcObject = null;
+  const rv = $("remoteVideo");
+  if (rv) rv.srcObject = null;
+  $("videoStatus").textContent = "摄像头已关闭";
+  videoState = "idle";
+  $("videoRequestPopup").classList.add("hidden");
+  // 停止远程音频
+  if (remoteAudio) {
+    remoteAudio.srcObject = null;
+    remoteAudio = null;
+  }
+  callActive = false;
+  isCaller = false;
+  negotiating = false;
+  updateCallUI();
+  if (sendSignal && onlineChannel && connected) {
+    onlineChannel.send({
+      type: 'broadcast',
+      event: 'webrtc_end_call',
+      payload: {}
+    }).catch(e => console.warn("发送挂断信号失败", e));
+  }
+  showToast("通话已结束");
+}
+
+function cleanupCall() {
+  // 清理资源但可能没有建立连接
+  if (pc) {
+    pc.close();
+    pc = null;
+  }
+  if (localStream) {
+    localStream.getTracks().forEach(track => track.stop());
+    localStream = null;
+  }
+  if (localVideoStream) {
+    localVideoStream.getTracks().forEach(track => track.stop());
+    localVideoStream = null;
+  }
+  cameraActive = false;
+  const lv = $("localVideo");
+  if (lv) lv.srcObject = null;
+  const rv = $("remoteVideo");
+  if (rv) rv.srcObject = null;
+  videoState = "idle";
+  $("videoRequestPopup").classList.add("hidden");
+  if (remoteAudio) {
+    remoteAudio.srcObject = null;
+    remoteAudio = null;
+  }
+  callActive = false;
+  isCaller = false;
+  negotiating = false;
+  updateCallUI();
+}
+
+function updateCallUI() {
+  const btn = $("callBtn");
+  if (callActive) {
+    btn.textContent = "📵";
+    btn.classList.add("active");
+  } else {
+    btn.textContent = "📞";
+    btn.classList.remove("active");
+  }
+}
+// ========== 单向视频（狗→主人） ==========
+async function startCamera() {
+  if (cameraActive) return;
+  if (!connected) { showToast("先进入房间"); return; }
+  if (myRole !== "player") { showToast("只有狗可以开启摄像头"); return; }
+  try {
+    localVideoStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false });
+    const lv = $("localVideo");
+    if (lv) { lv.srcObject = localVideoStream; lv.play().catch(e=>{}); }
+    if (!pc) {
+      pc = new RTCPeerConnection(rtcConfig);
+      pc.ontrack = (event) => {
+        if (event.track.kind === 'video') {
+          if (myRole === 'spectator') {
+            const rv = $("remoteVideo");
+            if (rv) {
+              rv.srcObject = event.streams[0];
+              rv.play().catch(e=>console.warn("播放远程视频失败",e));
+              $("videoStatus").textContent = "正在观看狗";
+            }
+            event.track.onended = () => {
+              $("videoStatus").textContent = "摄像头已关闭";
+              const r = $("remoteVideo");
+              if (r) r.srcObject = null;
+            };
+          }
+        } else {
+          if (!remoteAudio) { remoteAudio = new Audio(); remoteAudio.autoplay = true; }
+          remoteAudio.srcObject = event.streams[0];
+          remoteAudio.play().catch(e=>console.warn("播放远程音频失败",e));
+        }
+      };
+      pc.onnegotiationneeded = async () => {
+        if (negotiating || !pc) return;
+        try {
+          negotiating = true;
+          const offer = await pc.createOffer();
+          await pc.setLocalDescription(offer);
+          await onlineChannel.send({type:'broadcast',event:'webrtc_offer',payload:{sdp:offer}});
+        } catch(e) { console.warn("重新协商失败", e); }
+        finally { negotiating = false; }
+      };
+      pc.onicecandidate = ({ candidate }) => {
+        if (candidate && onlineChannel) {
+          onlineChannel.send({type:'broadcast',event:'webrtc_ice',payload:{candidate}}).catch(e=>{});
+        }
+      };
+      isCaller = true;
+      callActive = true;
+      updateCallUI();
+    }
+    localVideoStream.getTracks().forEach(track => pc.addTrack(track, localVideoStream));
+    cameraActive = true;
+    videoState = "connected";
+    $("videoStatus").textContent = "视频进行中";
+    if (onlineChannel && connected) {
+      onlineChannel.send({type:'broadcast',event:'video_allow',payload:{}}).catch(e=>{});
+    }
+    showToast("摄像头已开启，主人可看到你");
+  } catch(e) {
+    console.error("开启摄像头失败", e);
+    showToast("无法开启摄像头，请检查权限");
+    videoState = "permission_denied";
+    $("videoStatus").textContent = "摄像头权限被拒绝";
+    if (onlineChannel && connected) {
+      onlineChannel.send({type:'broadcast',event:'video_permission_denied',payload:{}}).catch(e=>{});
+    }
+    if (localVideoStream) { localVideoStream.getTracks().forEach(t=>t.stop()); localVideoStream = null; }
+  }
+}
+function endVideo(sendSignal) {
+  if (localVideoStream) {
+    localVideoStream.getTracks().forEach(track => {
+      if (pc) {
+        const sender = pc.getSenders().find(s => s.track === track);
+        if (sender) { try { pc.removeTrack(sender); } catch(e){} }
+      }
+      track.stop();
+    });
+    localVideoStream = null;
+  }
+  const lv = $("localVideo");
+  if (lv) lv.srcObject = null;
+  const rv = $("remoteVideo");
+  if (rv) rv.srcObject = null;
+  cameraActive = false;
+  videoState = "ended";
+  $("videoStatus").textContent = "视频已结束";
+  if (sendSignal !== false && onlineChannel && connected) {
+    onlineChannel.send({type:'broadcast',event:'video_end',payload:{}}).catch(e=>{});
+  }
+  showToast("视频已结束");
+}
+$("cameraOnBtn").onclick = startCamera;
+$("endVideoBtn").onclick = () => endVideo(true);
+// 视频请求机制
+function requestVideo() {
+  if (!connected) { showToast("先进入房间"); return; }
+  if (myRole !== "spectator") { showToast("只有主人可以请求视频"); return; }
+  if (videoState === "connected") { showToast("视频已连接"); return; }
+  videoState = "requesting";
+  $("videoStatus").textContent = "请求中...";
+  onlineChannel.send({type:'broadcast',event:'video_request',payload:{}}).catch(e=>{});
+  showToast("已向狗发送视频请求");
+}
+function handleVideoRequest() {
+  if (myRole !== "player") return;
+  if (cameraActive) { showToast("摄像头已开启"); return; }
+  videoState = "incoming_request";
+  $("videoStatus").textContent = "收到视频请求";
+  $("videoRequestPopup").classList.remove("hidden");
+}
+function allowVideo() {
+  $("videoRequestPopup").classList.add("hidden");
+  videoState = "allowing";
+  $("videoStatus").textContent = "正在开启摄像头...";
+  startCamera();
+}
+function denyVideo() {
+  $("videoRequestPopup").classList.add("hidden");
+  videoState = "denied";
+  $("videoStatus").textContent = "已拒绝";
+  onlineChannel.send({type:'broadcast',event:'video_deny',payload:{}}).catch(e=>{});
+  showToast("已拒绝视频请求");
+}
+function handleVideoAllow() {
+  if (myRole !== "spectator") return;
+  videoState = "connected";
+  $("videoStatus").textContent = "视频已连接";
+  showToast("狗已允许视频");
+}
+function handleVideoDeny() {
+  if (myRole !== "spectator") return;
+  videoState = "denied";
+  $("videoStatus").textContent = "视频请求已拒绝";
+  showToast("狗拒绝了视频请求");
+}
+function handleVideoPermissionDenied() {
+  if (myRole !== "spectator") return;
+  videoState = "permission_denied";
+  $("videoStatus").textContent = "摄像头权限被拒绝";
+  showToast("狗的摄像头权限被拒绝");
+}
+function handleVideoEnd() {
+  if (localVideoStream) {
+    localVideoStream.getTracks().forEach(track => track.stop());
+    localVideoStream = null;
+  }
+  const lv = $("localVideo");
+  if (lv) lv.srcObject = null;
+  const rv = $("remoteVideo");
+  if (rv) rv.srcObject = null;
+  cameraActive = false;
+  videoState = "ended";
+  $("videoStatus").textContent = "视频已结束";
+  showToast("视频已结束");
+}
+$("requestVideoBtn").onclick = requestVideo;
+$("videoAllowBtn").onclick = allowVideo;
+$("videoDenyBtn").onclick = denyVideo;
+// 视频卡片折叠/展开
+$("videoCardHeader").onclick = () => {
+  const body = $("videoCardBody");
+  const toggle = $("videoCardToggle");
+  body.classList.toggle("hidden");
+  toggle.textContent = body.classList.contains("hidden") ? "▶" : "▼";
+};
+
+// 音乐播放（保持不变）
+const audioElement=new Audio();let currentMusicUrl=null;
+const musicVolume=$("musicVolume");
+const musicLoopBtn=$("musicLoopBtn");
+let loopEnabled=false;
+
+musicVolume.addEventListener("input", ()=>{
+  audioElement.volume = parseFloat(musicVolume.value);
+});
+
+musicLoopBtn.addEventListener("click", ()=>{
+  loopEnabled = !loopEnabled;
+  audioElement.loop = loopEnabled;
+  musicLoopBtn.classList.toggle("active", loopEnabled);
+  musicLoopBtn.textContent = loopEnabled ? "🔁 (开)" : "🔁";
+  showToast(loopEnabled ? "循环已开启" : "循环已关闭");
+});
+
+$("musicUploadBtn").onclick=()=>{
+  $("musicFile").value="";
+  $("musicFile").click();
+};
+$("musicFile").onchange=e=>{
+  const f=e.target.files?.[0];if(!f)return;
+  if(currentMusicUrl)URL.revokeObjectURL(currentMusicUrl);
+  currentMusicUrl=URL.createObjectURL(f);
+  audioElement.src=currentMusicUrl;
+  $("musicSongName").textContent=f.name;
+  $("musicPlayBtn").disabled=false;
+  showLoading("音乐加载中...");
+  let musicLoadDone=false;
+  let musicLoadTimer=setTimeout(()=>{
+    if(musicLoadDone)return;
+    musicLoadDone=true;
+    hideLoading();
+    showToast("音乐已加载");
+  },3000);
+  const onMusicReady=()=>{
+    if(musicLoadDone)return;
+    musicLoadDone=true;
+    clearTimeout(musicLoadTimer);
+    hideLoading();
+    showToast("音乐已加载");
+  };
+  audioElement.onloadedmetadata=onMusicReady;
+  audioElement.oncanplay=onMusicReady;
+  audioElement.onerror = ()=>{
+    if(musicLoadDone)return;
+    musicLoadDone=true;
+    clearTimeout(musicLoadTimer);
+    hideLoading();
+    showToast("音乐加载失败");
+  };
+};
+$("musicPlayBtn").onclick=()=>{
+  if(!currentMusicUrl)return;
+  if(audioElement.paused)audioElement.play();
+  else audioElement.pause();
+  $("musicPlayBtn").textContent=audioElement.paused?"▶️":"⏸️";
+};
+$("musicBall").onclick=()=>$("musicPanel").classList.toggle("hidden");
+audioElement.addEventListener("timeupdate",()=>{
+  if(!audioElement.duration)return;
+  $("musicCurrentTime").textContent=fmt(audioElement.currentTime);
+  $("musicDuration").textContent=fmt(audioElement.duration);
+  $("musicProgressFill").style.width=(audioElement.currentTime/audioElement.duration*100)+"%";
+});
+$("musicProgressBg").onclick=e=>{
+  if(!audioElement.duration)return;
+  const r=$("musicProgressBg").getBoundingClientRect();
+  audioElement.currentTime=((e.clientX-r.left)/r.width)*audioElement.duration;
+};
+function fmt(s){if(!isFinite(s))return"0:00";const m=Math.floor(s/60),sec=Math.floor(s%60);return m+":"+(sec<10?"0":"")+sec;}
+
+// 音乐悬浮球拖拽
+(function(){
+  const float = $("musicFloat");
+  const ball = $("musicBall");
+  let isDragging = false;
+  let startX, startY, origLeft, origTop;
+  let moved = false;
+
+  function getPos(e){
+    const t = e.touches ? e.touches[0] : e;
+    return {x: t.clientX, y: t.clientY};
+  }
+
+  function onStart(e){
+    if (!ball.contains(e.target)) return;
+    isDragging = true;
+    moved = false;
+    const rect = float.getBoundingClientRect();
+    float.style.left = rect.left + 'px';
+    float.style.top = rect.top + 'px';
+    float.style.right = 'auto';
+    float.style.bottom = 'auto';
+    const pos = getPos(e);
+    startX = pos.x;
+    startY = pos.y;
+    origLeft = rect.left;
+    origTop = rect.top;
+    // 注意：不再调用 e.preventDefault()，避免阻止 click 事件
+  }
+
+  function onMove(e){
+    if (!isDragging) return;
+    const pos = getPos(e);
+    const dx = pos.x - startX;
+    const dy = pos.y - startY;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) moved = true;
+    float.style.left = (origLeft + dx) + 'px';
+    float.style.top = (origTop + dy) + 'px';
+    e.preventDefault(); // 防止页面滚动
+  }
+
+  function onEnd(e){
+    if (!isDragging) return;
+    isDragging = false;
+    if (moved) {
+      ball.addEventListener('click', function preventClick(e){
+        e.stopImmediatePropagation();
+        e.preventDefault();
+      }, {once: true, capture: true});
+    }
+  }
+
+  ball.addEventListener('mousedown', onStart);
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('mouseup', onEnd);
+  ball.addEventListener('touchstart', onStart, {passive: false});
+  document.addEventListener('touchmove', onMove, {passive: false});
+  document.addEventListener('touchend', onEnd);
+})();
+
+renderTasks();renderFinalTasks();createFeelingButtons();updateGameUI();
+document.addEventListener("touchstart",()=>{try{window._actx?.resume();}catch(e){}},{once:true,passive:true});
+</script>
+</body>
+</html>
