@@ -5122,7 +5122,7 @@ class VoiceTTSEngine {
   constructor() {
     this.synth = window.speechSynthesis || null;
     this.enabled = safeGetStorage("slave_tts_enabled", "true") === "true";
-    this.edgeTtsUrl = safeGetStorage("slave_edge_tts_url", "https://voiceforge-pro.pages.dev/api/tts");
+    this.edgeTtsUrl = safeGetStorage("slave_edge_tts_url", "/api/tts");
     this.audio = null;
   }
   async speak(text, role = "master") {
