@@ -2989,6 +2989,31 @@ html, body, button, input, select, textarea, .btn, .header-icon-btn, .board-tile
       <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Edge TTS 语音地址 (留空用浏览器自带语音)：</div>
       <input type="text" id="settingEdgeTtsUrl" class="styled-input" placeholder="https://your-edge-tts-worker.workers.dev/tts">
     </div>
+    <div style="margin-bottom:14px;text-align:left;">
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">主人语音 (AI主宰)：</div>
+      <select id="settingMasterVoice" class="styled-input">
+        <option value="zh-CN-YunjianNeural">云健 (低沉威严，推荐)</option>
+        <option value="zh-CN-YunyangNeural">云扬 (专业新闻播报)</option>
+        <option value="zh-CN-YunxiNeural">云希 (阳光少年)</option>
+        <option value="zh-CN-YunfengNeural">云枫 (成熟大叔)</option>
+        <option value="zh-CN-YunhaoNeural">云浩 (运动型男)</option>
+        <option value="zh-CN-YunyeNeural">云野 (沉稳磁性)</option>
+      </select>
+    </div>
+    <div style="margin-bottom:14px;text-align:left;">
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">奴仆语音 (AI奴犬)：</div>
+      <select id="settingPetVoice" class="styled-input">
+        <option value="zh-CN-XiaoxiaoNeural">晓晓 (温柔娇羞，推荐)</option>
+        <option value="zh-CN-XiaoyiNeural">晓伊 (活泼可爱)</option>
+        <option value="zh-CN-XiaohanNeural">晓涵 (温柔知性)</option>
+        <option value="zh-CN-XiaomengNeural">晓梦 (甜美少女)</option>
+        <option value="zh-CN-XiaomoNeural">晓墨 (清冷文艺)</option>
+        <option value="zh-CN-XiaoxuanNeural">晓萱 (活力满满)</option>
+        <option value="zh-CN-XiaoyanNeural">晓颜 (优雅御姐)</option>
+        <option value="zh-CN-XiaozhenNeural">晓甄 (成熟姐姐)</option>
+        <option value="zh-CN-liaoning-XiaobeiNeural">晓北 (东北大妞，幽默)</option>
+      </select>
+    </div>
     <div class="btn-grid">
       <button type="button" id="saveSettingsBtn" class="btn btn-primary">保存配置</button>
       <button type="button" id="closeSettingsBtn" class="btn">取消</button>
@@ -5123,6 +5148,8 @@ class VoiceTTSEngine {
     this.synth = window.speechSynthesis || null;
     this.enabled = safeGetStorage("slave_tts_enabled", "true") === "true";
     this.edgeTtsUrl = safeGetStorage("slave_edge_tts_url", "/api/tts");
+    this.masterVoice = safeGetStorage("slave_tts_master_voice", "zh-CN-YunjianNeural");
+    this.petVoice = safeGetStorage("slave_tts_pet_voice", "zh-CN-XiaoxiaoNeural");
     this.audio = null;
   }
   async speak(text, role = "master") {
@@ -5131,11 +5158,11 @@ class VoiceTTSEngine {
       const clean = text.replace(/\[.*?\]/g, "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9，。！？、…～\s]/g, "");
       if (!clean.trim()) return;
 
-      // 优先用 Edge TTS（如果配置了）
+      // 优先用 Edge TTS
       if (this.edgeTtsUrl) {
         try {
           this.stop();
-          const voice = role === "master" ? "zh-CN-YunjianNeural" : "zh-CN-XiaoxiaoNeural";
+          const voice = role === "master" ? this.masterVoice : this.petVoice;
           const url = `${this.edgeTtsUrl}?text=${encodeURIComponent(clean)}&voice=${voice}`;
           this.audio = new Audio(url);
           this.audio.playbackRate = 0.95;
@@ -6825,7 +6852,9 @@ $("settingsBtn").onclick = () => {
   $("settingPetName").value = safeGetStorage("slave_name_pet", "奴犬");
   $("settingPunishLimit").value = state.punishmentThreshold;
   $("settingVibrateToggle").checked = state.vibrateEnabled;
-  $("settingEdgeTtsUrl").value = safeGetStorage("slave_edge_tts_url", "");
+  $("settingEdgeTtsUrl").value = safeGetStorage("slave_edge_tts_url", "/api/tts");
+  $("settingMasterVoice").value = safeGetStorage("slave_tts_master_voice", "zh-CN-YunjianNeural");
+  $("settingPetVoice").value = safeGetStorage("slave_tts_pet_voice", "zh-CN-XiaoxiaoNeural");
   $("settingsModal").classList.remove("hidden");
 };
 $("closeSettingsBtn").onclick = () => $("settingsModal").classList.add("hidden");
@@ -6836,6 +6865,10 @@ $("saveSettingsBtn").onclick = () => {
   state.vibrateEnabled = $("settingVibrateToggle").checked;
   safeSetStorage("slave_edge_tts_url", $("settingEdgeTtsUrl").value.trim());
   voiceTTS.edgeTtsUrl = $("settingEdgeTtsUrl").value.trim();
+  voiceTTS.masterVoice = $("settingMasterVoice").value;
+  voiceTTS.petVoice = $("settingPetVoice").value;
+  safeSetStorage("slave_tts_master_voice", voiceTTS.masterVoice);
+  safeSetStorage("slave_tts_pet_voice", voiceTTS.petVoice);
   $("settingsModal").classList.add("hidden");
   showToast("终端设置已成功保存！", "⚙️");
 };
