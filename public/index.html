@@ -9,42 +9,6 @@
 <meta name="format-detection" content="telephone=no">
 <title>⛓️ 奴 契 · 终 极 调 教 终 端 PRO v5.8 ⛓️</title>
 
-<!-- Supabase Realtime SDK Auto-Loader -->
-<script>
-window.__supabaseLoaded = false;
-function loadSupabaseSDK(){
-  const sources = [
-    "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2",
-    "https://unpkg.com/@supabase/supabase-js@2",
-    "https://cdnjs.cloudflare.com/ajax/libs/supabase/2.39.8/supabase.min.js"
-  ];
-  let idx = 0;
-  function tryNext(){
-    if(idx >= sources.length){
-      console.warn("Supabase SDK load failed on all CDNs; offline/single-player fallback active.");
-      window.dispatchEvent(new CustomEvent("supabase-sdk-failed"));
-      return;
-    }
-    const s = document.createElement("script");
-    s.src = sources[idx];
-    s.async = false;
-    s.onload = () => {
-      if(window.supabase?.createClient){
-        window.__supabaseLoaded = true;
-        window.dispatchEvent(new CustomEvent("supabase-sdk-ready"));
-      } else {
-        idx++;
-        tryNext();
-      }
-    };
-    s.onerror = () => { idx++; tryNext(); };
-    document.head.appendChild(s);
-  }
-  tryNext();
-}
-loadSupabaseSDK();
-</script>
-
 <style>
 /* ==========================================================================
    MULTI-THEME COLOR ENGINE & CSS VARIABLES
@@ -2068,20 +2032,6 @@ html, body, button, input, select, textarea, .btn, .header-icon-btn, .board-tile
     <div class="app-subtitle">身躯与尿意完全臣服 · 双向 AI 人设驱动与终极契约终端</div>
   </header>
 
-  <!-- GAME MODE SELECTOR SEGMENTED CONTROL -->
-  <div class="mode-switch-wrapper">
-    <div class="mode-segmented-control">
-      <button type="button" id="modeSoloAiBtn" class="mode-segment-btn active">
-        <span class="mode-title">🤖 单人 AI 调教模式</span>
-        <span class="mode-desc">清爽无扰 · 沉浸人机支配对局</span>
-      </button>
-      <button type="button" id="modeMultiplayerBtn" class="mode-segment-btn">
-        <span class="mode-title">🔗 双人远程联机</span>
-        <span class="mode-desc">上锁开房 · 实时音视频监控</span>
-      </button>
-    </div>
-  </div>
-
   <!-- ROLE SELECTION CARD (AVAILABLE & CLEAR IN BOTH MODES) -->
   <div class="glass-card" id="roleSelectionCard">
     <div class="card-header">
@@ -2102,37 +2052,6 @@ html, body, button, input, select, textarea, .btn, .header-icon-btn, .board-tile
         <span class="role-desc">绝对支配 · AI 将扮演【顺从奴仆】</span>
       </button>
     </div>
-  </div>
-
-  <!-- MULTIPLAYER ONLY: ROOM CARD (HIDDEN IN SOLO AI MODE) -->
-  <div class="glass-card multiplayer-only hidden" id="roomCard">
-    <div class="card-header">
-      <div class="card-title">
-        <span>🔗 双人联机加密通道</span>
-      </div>
-      <div id="channelBadge" class="card-badge">单人/等待上锁</div>
-    </div>
-
-    <div class="status-pill">
-      <div class="status-indicator">
-        <div id="statusDot" class="status-dot"></div>
-        <span id="statusText">尚未接入联机房间</span>
-      </div>
-      <button type="button" id="shareRoomBtn" class="btn btn-sm btn-gold hidden">📋 分享房间</button>
-    </div>
-
-    <!-- Room ID Input & Actions -->
-    <div class="room-input-group">
-      <input id="roomInput" class="styled-input" placeholder="输入 6 位房间号，如 888666" maxlength="20">
-      <button type="button" id="quickGenRoomBtn" class="btn" style="width:48px;" title="随机生成">🎲</button>
-    </div>
-
-    <div class="btn-grid">
-      <button type="button" id="createRoomBtn" class="btn btn-primary">🔒 开房上锁</button>
-      <button type="button" id="joinRoomBtn" class="btn btn-purple">🔗 钻入房间</button>
-    </div>
-
-    <button type="button" id="leaveRoomBtn" class="btn btn-danger w-full hidden" style="margin-top:8px;">🚪 退出当前房间</button>
   </div>
 
   <!-- START / PREPARATION PAGE -->
@@ -2484,39 +2403,6 @@ html, body, button, input, select, textarea, .btn, .header-icon-btn, .board-tile
       </div>
     </div>
 
-    <!-- MULTIPLAYER ONLY: WebRTC Video Viewport -->
-    <div id="videoPanelCard" class="glass-card multiplayer-only hidden">
-      <button type="button" class="card-header w-full" id="videoHeaderBar" style="cursor:pointer;background:none;border:none;">
-        <span class="card-title">📹 单向实时视界 (奴犬 → 主人)</span>
-        <div class="flex items-center gap-2">
-          <span id="videoStatusBadge" class="card-badge">未开启</span>
-          <span id="videoToggleChevron" style="font-size:12px;color:var(--text-muted);">▼</span>
-        </div>
-      </button>
-      <div id="videoPanelBody" class="video-card-body">
-        <div id="remoteVideoWrapper" class="hidden" style="position:relative;">
-          <video id="remoteVideo" class="video-viewport" autoplay playsinline webkit-playsinline></video>
-          <div id="videoPlayOverlay" class="hidden" style="position:absolute;inset:0;background:rgba(0,0,0,0.7);display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:var(--radius-md);cursor:pointer;z-index:10;">
-            <span style="font-size:36px;margin-bottom:6px;">▶️</span>
-            <span style="font-size:12px;color:#fff;font-weight:800;">iOS 画面播放受限 · 点击此处激活画面</span>
-          </div>
-          <div id="videoFilterOverlay" style="position:absolute;top:10px;left:10px;display:flex;gap:4px;z-index:5;">
-            <button type="button" id="toggleNightVisionBtn" class="btn btn-sm" style="font-size:10px;min-height:26px;padding:2px 8px;background:rgba(0,0,0,0.6);border-color:#10b981;color:#6ee7b7;">🕶️ 暗夜绿光</button>
-            <button type="button" id="snapPolaroidBtn" class="btn btn-sm" style="font-size:10px;min-height:26px;padding:2px 8px;background:rgba(0,0,0,0.6);border-color:#f59e0b;color:#fcd34d;">📸 拍立得抓拍</button>
-          </div>
-        </div>
-        <div id="localVideoWrapper" class="hidden">
-          <video id="localVideo" class="video-viewport" autoplay playsinline muted></video>
-        </div>
-        <div class="btn-grid" style="margin-top:10px;">
-          <button type="button" id="requestVideoBtn" class="btn btn-purple hidden">📹 调取奴犬画面</button>
-          <button type="button" id="cameraOnBtn" class="btn btn-primary hidden">📹 开启我的摄像头</button>
-          <button type="button" id="flipCameraBtn" class="btn btn-gold hidden">🔄 翻转前后摄</button>
-          <button type="button" id="endVideoBtn" class="btn btn-danger hidden">🚫 关闭视频流</button>
-        </div>
-      </div>
-    </div>
-
     <!-- Integrated Action Hub (Tabbed: Chat, Feeling, Chronicle) -->
     <div class="glass-card" id="actionHubCard">
       <div class="tab-switch" style="grid-template-columns:1fr 1fr 1fr 1fr;margin-bottom:12px;">
@@ -2530,7 +2416,6 @@ html, body, button, input, select, textarea, .btn, .header-icon-btn, .board-tile
       <div id="hubChatSection">
         <div class="flex items-center justify-between" style="margin-bottom:8px;">
           <span class="card-title" id="chatCardTitle" style="font-size:13.5px;">🔮 与 AI 主仆密语</span>
-          <button type="button" id="voiceCallBtn" class="btn btn-sm btn-gold multiplayer-only hidden">📞 实时通话</button>
         </div>
         <div class="quick-phrases-scroll" id="quickPhrasesBar"></div>
         <div id="chatWindow" class="chat-window">
@@ -2895,23 +2780,6 @@ html, body, button, input, select, textarea, .btn, .header-icon-btn, .board-tile
   </div>
 </div>
 
-<!-- Share Room QR Modal -->
-<div id="shareRoomModal" class="modal-overlay hidden" data-modal="shareRoomModal">
-  <div class="modal-box">
-    <button type="button" class="modal-close-x" data-close-target="shareRoomModal">×</button>
-    <div class="modal-icon">📱</div>
-    <div class="modal-title">邀请另一半加入房间</div>
-    <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px;">房间代码：<span id="shareRoomCodeSpan" style="font-weight:900;color:var(--crimson);font-size:18px;"></span></div>
-    <div id="shareQrContainer" style="display:flex;justify-content:center;margin:12px 0;"></div>
-    <input id="shareUrlInput" class="styled-input" readonly style="font-size:12px !important;margin-bottom:12px;text-align:center;">
-    <div class="btn-grid">
-      <button type="button" id="copyShareLinkBtn" class="btn btn-primary">📋 复制专属邀请链接</button>
-      <button type="button" id="closeShareModalBtn" class="btn">关闭</button>
-    </div>
-  </div>
-</div>
-
-
 <!-- Fate Card Drawing Modal -->
 <div id="fateCardModal" class="modal-overlay hidden" data-modal="fateCardModal">
   <div class="modal-box" style="border-color:var(--border-purple);box-shadow:0 0 50px var(--purple-glow);max-width:390px;">
@@ -3115,11 +2983,6 @@ html, body, button, input, select, textarea, .btn, .header-icon-btn, .board-tile
     <div style="margin-bottom:14px;text-align:left;">
       <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">触觉震动反馈 (支持的手机)：</div>
       <input type="checkbox" id="settingVibrateToggle" checked style="accent-color:var(--crimson);width:20px;height:20px;">
-    </div>
-    <div style="margin-bottom:14px;text-align:left;">
-      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Supabase 云同步配置 (默认已自带公共节点)：</div>
-      <input type="text" id="settingCustomUrl" class="styled-input" placeholder="Custom Supabase URL" style="margin-bottom:6px;">
-      <input type="text" id="settingCustomKey" class="styled-input" placeholder="Custom Supabase Anon Key">
     </div>
     <div class="btn-grid">
       <button type="button" id="saveSettingsBtn" class="btn btn-primary">保存配置</button>
@@ -4627,42 +4490,6 @@ document.querySelectorAll(".modal-close-x").forEach(btn => {
   };
 });
 
-// ==========================================================================
-// GAME MODE MANAGEMENT (SOLO AI VS MULTIPLAYER CLUTTER-FREE)
-// ==========================================================================
-function setGameMode(mode) {
-  state.gameMode = mode;
-  safeSetStorage("slave_game_mode", mode);
-
-  const isSolo = mode === "solo";
-  $("modeSoloAiBtn").classList.toggle("active", isSolo);
-  $("modeMultiplayerBtn").classList.toggle("active", !isSolo);
-
-  // In Solo mode: Completely hide room card and all multiplayer-only controls!
-  $("roomCard").classList.toggle("hidden", isSolo);
-  document.querySelectorAll(".multiplayer-only").forEach(el => {
-    el.classList.toggle("hidden", isSolo);
-  });
-
-  // Dynamically update Chat Card Header
-  const chatTitle = $("chatCardTitle");
-  if (isSolo) {
-    chatTitle.textContent = state.role === "spectator" ? "🔮 与 AI 奴仆密语" : "🔮 与 AI 主宰密语";
-  } else {
-    chatTitle.textContent = "🔮 主仆密语与实时通话";
-  }
-
-  updateDeepSeekBadge();
-}
-
-$("modeSoloAiBtn").onclick = () => {
-  setGameMode("solo");
-  showToast("已切换为【单人 AI 调教模式】· 界面已精简", "🤖");
-};
-$("modeMultiplayerBtn").onclick = () => {
-  setGameMode("multiplayer");
-  showToast("已切换为【双人远程联机模式】", "🔗");
-};
 
 // Task Categories & Detection
 const TYPE_KEYWORDS = {
@@ -5107,7 +4934,6 @@ function renderFeelingNodes() {
       state.feeling = i;
       renderFeelingNodes();
       updateGameUI();
-      sendOnlineGameState();
   saveActiveSession();
       const label = state.role === "spectator" ? `主人核定奴仆负荷为：${FEELING_DESCRIPTIONS[i - 1]}` : `奴犬汇报感觉升至：${FEELING_DESCRIPTIONS[i - 1]}`;
       logChronicle(label);
@@ -5196,7 +5022,6 @@ $("acceptGachaTaskBtn").onclick = () => {
     detectWaterAndAddReservoir(currentGachaTask.text);
     showActiveEvent(currentGachaTask, false);
     updateGameUI();
-    sendOnlineGameState();
     showToast("已领受扭蛋禁忌口令！", "⛓️");
   }
 };
@@ -5220,7 +5045,6 @@ $("confirmSurrenderBtn").onclick = () => {
 
   updateReservoirUI();
   updateGameUI();
-  sendOnlineGameState();
 
   showToast("🚨 认输破戒！已准予泄洪，加罚2点惩罚债与30下掌掴赎罪！", "🚨");
   logChronicle("🚨 奴犬无法忍受膀胱重压，认输求饶泄洪！水库清零，追加 2 点惩罚债务！");
@@ -5865,7 +5689,6 @@ function launchGameAfterPact() {
   renderFeelingNodes();
   updateGameUI();
   updateReservoirUI();
-  sendOnlineGameState();
   audioFX.playRollSuccess();
 }
 
@@ -6034,7 +5857,6 @@ function triggerForcedPunishment() {
   showToast("惩罚债已达上限！必须完成强制惩罚方可继续！", "⚡");
   logChronicle(`⚡ 惩罚债满额！触发强制惩罚：${pTask.text}`);
   updateGameUI();
-  sendOnlineGameState();
   saveActiveSession();
 }
 
@@ -6098,7 +5920,6 @@ async function rollDiceAction() {
       }
       state.rolling = false;
       updateGameUI();
-      sendOnlineGameState();
       saveActiveSession();
       return;
     }
@@ -6114,7 +5935,6 @@ async function rollDiceAction() {
         }, 550);
         state.rolling = false;
         updateGameUI();
-        sendOnlineGameState();
         saveActiveSession();
         return;
       } else if (state.position % 5 === 0) {
@@ -6125,7 +5945,6 @@ async function rollDiceAction() {
         }, 550);
         state.rolling = false;
         updateGameUI();
-        sendOnlineGameState();
         saveActiveSession();
         return;
       } else if (state.position % 11 === 0) {
@@ -6137,7 +5956,6 @@ async function rollDiceAction() {
         }, 550);
         state.rolling = false;
         updateGameUI();
-        sendOnlineGameState();
         saveActiveSession();
         return;
       } else if (state.position % 14 === 0) {
@@ -6148,7 +5966,6 @@ async function rollDiceAction() {
         }, 550);
         state.rolling = false;
         updateGameUI();
-        sendOnlineGameState();
         saveActiveSession();
         return;
       }
@@ -6226,7 +6043,6 @@ async function rollDiceAction() {
 
     state.rolling = false;
     updateGameUI();
-    sendOnlineGameState();
     saveActiveSession();
   }, 500);
 }
@@ -6253,7 +6069,6 @@ function handleTaskFeedback(type) {
     showToast(isSpec ? "奴仆已承受完极刑，惩罚债全数归零" : "强制极刑已服从完成，惩罚债已全数清零！", "✨");
     logChronicle("强制极刑完成，惩罚债归零，重获自由移动权");
     updateGameUI();
-    sendOnlineGameState();
   saveActiveSession();
 
     if (isSpec && state.autoAdvance) {
@@ -6343,7 +6158,6 @@ function handleTaskFeedback(type) {
     finishGameCelebration();
   }
   updateGameUI();
-  sendOnlineGameState();
   saveActiveSession();
 
   // If Master enabled auto-advance, automatically trigger next roll after approval!
@@ -6404,7 +6218,6 @@ $("submitLightenPleadBtn").onclick = async () => {
   $("lightenPetIcon").textContent = "🙏";
   $("lightenPetTitle").textContent = "哀求已呈递";
   $("lightenPetDesc").textContent = "等待主人在视界中裁定是否恩准……";
-  sendOnlineGameState();
   saveActiveSession();
 };
 $("cancelLightenPleadBtn").onclick = () => $("lightenPetModal").classList.add("hidden");
@@ -6440,7 +6253,6 @@ function finishGameCelebration() {
   logChronicle("⛓️ 奴契走完全程，抵达终极囚笼！");
   audioFX.playRollSuccess();
   updateGameUI();
-  sendOnlineGameState();
   saveActiveSession();
 }
 $("finalTaskBtn").onclick = () => {
@@ -6500,7 +6312,6 @@ function origStartGame_disabled() {
 
   renderFeelingNodes();
   updateGameUI();
-  sendOnlineGameState();
   saveActiveSession();
   audioFX.playRollSuccess();
 };
@@ -6517,7 +6328,6 @@ function restartGameSession() {
   $("diceResultText").textContent = "契约重置，重新面对你的命运吧。";
   renderFeelingNodes();
   updateGameUI();
-  sendOnlineGameState();
   saveActiveSession();
   logChronicle("↻ 契约重置，新一轮开局！");
   showToast("契约已重开！", "↻");
@@ -6529,223 +6339,6 @@ $("escapeToLobbyBtn").onclick = () => {
   $("startPage").classList.remove("hidden");
   updateGameUI();
 };
-
-// ==========================================================================
-// SUPABASE REALTIME & ROOM MULTIPLAYER
-// ==========================================================================
-const SUPABASE_DEFAULT_URL = "https://yjfdfghryblkmneiyfbg.supabase.co";
-const SUPABASE_DEFAULT_KEY = "sb_publishable_sdYAgv7j6cI35XLyNoEecA_1hA5D6uk";
-
-function getSupabaseConfig() {
-  return {
-    url: safeGetStorage("slave_supa_url", SUPABASE_DEFAULT_URL),
-    key: safeGetStorage("slave_supa_key", SUPABASE_DEFAULT_KEY)
-  };
-}
-
-function initSupabaseClient() {
-  if (!window.supabase?.createClient) return false;
-  try {
-    const cfg = getSupabaseConfig();
-    state.supabase = window.supabase.createClient(cfg.url, cfg.key, {
-      auth: { persistSession: false, autoRefreshToken: false },
-      realtime: { params: { eventsPerSecond: 10 } }
-    });
-    return true;
-  } catch(e) {
-    console.warn("Supabase client init failed", e);
-    return false;
-  }
-}
-window.addEventListener("supabase-sdk-ready", initSupabaseClient);
-if (window.__supabaseLoaded) initSupabaseClient();
-
-$("rolePlayerBtn").onclick = () => {
-  if (!$("gamePage").classList.contains("hidden") && !state.gameOver) return showToast("调教进行中严禁更换身份");
-  state.role = "player";
-  $("rolePlayerBtn").classList.add("active");
-  $("roleSpectatorBtn").classList.remove("active");
-  setGameMode(state.gameMode || "solo");
-  updateDeepSeekBadge();
-  updateGameUI();
-  if (state.connected) sendOnlineGameState();
-  saveActiveSession();
-  showToast("身份已切换为：🐕 奴犬（AI变为主宰）");
-};
-$("roleSpectatorBtn").onclick = () => {
-  if (!$("gamePage").classList.contains("hidden") && !state.gameOver) return showToast("调教进行中严禁更换身份");
-  state.role = "spectator";
-  $("roleSpectatorBtn").classList.add("active");
-  $("rolePlayerBtn").classList.remove("active");
-  setGameMode(state.gameMode || "solo");
-  updateDeepSeekBadge();
-  updateGameUI();
-  showToast("身份已切换为：👑 主人（AI变为奴仆）");
-};
-
-$("quickGenRoomBtn").onclick = () => {
-  const id = String(Math.floor(100000 + Math.random() * 900000));
-  $("roomInput").value = id;
-};
-
-async function connectToRoom(roomId) {
-  if (!state.supabase && !initSupabaseClient()) {
-    showToast("云端通信引擎尚未加载，请检查网络", "🔴");
-    return;
-  }
-  try {
-    if (state.channel) await state.supabase.removeChannel(state.channel);
-    state.roomId = String(roomId).trim();
-    $("statusDot").className = "status-dot connecting";
-    $("statusText").textContent = `正在连接房间 #${state.roomId}…`;
-
-    state.channel = state.supabase.channel(`slave-room-${state.roomId}`, {
-      config: { broadcast: { ack: true } }
-    });
-
-    state.channel.on("broadcast", { event: "game_state" }, ({ payload }) => {
-      if (state.role === "spectator") applyRemotePetState(payload);
-    });
-    state.channel.on("broadcast", { event: "command" }, ({ payload }) => {
-      if (state.role === "player") receiveMasterCommand(payload);
-    });
-    state.channel.on("broadcast", { event: "chat" }, ({ payload }) => {
-      if (payload?.message) appendChatMessage(payload.role, payload.message);
-    });
-    state.channel.on("broadcast", { event: "lighten_allow" }, () => {
-      if (state.role === "player") executeLightenAllowed();
-    });
-    state.channel.on("broadcast", { event: "lighten_deny" }, () => {
-      if (state.role === "player") executeLightenDenied();
-    });
-
-    state.channel.on("broadcast", { event: "webrtc_offer" }, async ({ payload }) => {
-      await handleWebRtcOffer(payload);
-    });
-    state.channel.on("broadcast", { event: "webrtc_answer" }, async ({ payload }) => {
-      await handleWebRtcAnswer(payload);
-    });
-    state.channel.on("broadcast", { event: "webrtc_ice" }, async ({ payload }) => {
-      await handleWebRtcIce(payload);
-    });
-    state.channel.on("broadcast", { event: "webrtc_end" }, () => {
-      endVoiceCall(false);
-    });
-
-    state.channel.on("broadcast", { event: "video_request" }, () => handleIncomingVideoRequest());
-    state.channel.on("broadcast", { event: "video_allow" }, () => handleIncomingVideoAllow());
-    state.channel.on("broadcast", { event: "video_deny" }, () => handleIncomingVideoDeny());
-    state.channel.on("broadcast", { event: "video_end" }, () => handleIncomingVideoEnd());
-
-    await new Promise((resolve, reject) => {
-      const timer = setTimeout(() => reject(new Error("连接超时")), 10000);
-      state.channel.subscribe(status => {
-        if (status === "SUBSCRIBED") {
-          clearTimeout(timer);
-          state.connected = true;
-          resolve();
-        } else if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
-          clearTimeout(timer);
-          reject(new Error(status));
-        }
-      });
-    });
-
-    $("statusDot").className = "status-dot connected";
-    $("statusText").textContent = `已成功落锁入房 · #${state.roomId}`;
-    $("channelBadge").textContent = `联机中 #${state.roomId}`;
-    $("leaveRoomBtn").classList.remove("hidden");
-    $("shareRoomBtn").classList.remove("hidden");
-
-    if (state.role === "player") sendOnlineGameState();
-  saveActiveSession();
-    showToast(`成功进入专属房间 #${state.roomId}`, "🔒");
-    logChronicle(`已建立实时密道，进入房间 #${state.roomId}`);
-  } catch(err) {
-    state.connected = false;
-    $("statusDot").className = "status-dot";
-    $("statusText").textContent = "入房失败，请检查网络或重试";
-    showToast("无法接入房间，请稍后重试", "❌");
-  }
-}
-
-async function leaveRoomSession() {
-  if (state.timerInterval) {
-    clearInterval(state.timerInterval);
-    state.timerInterval = null;
-  }
-  if (voiceCallActive) endVoiceCall(true);
-  if (videoStreamActive) endVideoStreaming(true);
-  if (state.channel && state.supabase) {
-    try { await state.supabase.removeChannel(state.channel); } catch(e){}
-  }
-  state.connected = false;
-  state.channel = null;
-  state.roomId = null;
-
-  $("statusDot").className = "status-dot";
-  $("statusText").textContent = "尚未接入联机房间";
-  $("channelBadge").textContent = "单人/等待上锁";
-  $("leaveRoomBtn").classList.add("hidden");
-  $("shareRoomBtn").classList.add("hidden");
-  showToast("已安全断开联机连接", "🚪");
-}
-
-$("createRoomBtn").onclick = () => {
-  const id = String(Math.floor(100000 + Math.random() * 900000));
-  $("roomInput").value = id;
-  connectToRoom(id);
-};
-$("joinRoomBtn").onclick = () => {
-  const val = $("roomInput").value.trim();
-  if (!val) return showToast("请先填入房间号");
-  connectToRoom(val);
-};
-$("leaveRoomBtn").onclick = leaveRoomSession;
-
-async function sendOnlineGameState() {
-  if (!state.connected || !state.channel || state.role !== "player") return;
-  try {
-    await state.channel.send({
-      type: "broadcast",
-      event: "game_state",
-      payload: {
-        position: state.position,
-        totalCells: state.totalCells,
-        feeling: state.feeling,
-        lastDice: state.lastDice,
-        currentTask: state.currentTask ? state.currentTask.text : null,
-        currentTaskType: state.currentTaskType,
-        punishmentPoints: state.punishmentPoints,
-        gameOver: state.gameOver,
-        feedbackStatus: state.feedbackStatus,
-        timestamp: Date.now()
-      }
-    });
-  } catch(e){}
-}
-
-function applyRemotePetState(data) {
-  if (!data) return;
-  $("telemetryPos").textContent = `${data.position ?? 0} / ${data.totalCells || state.totalCells}`;
-  $("telemetryDice").textContent = data.lastDice ? `${data.lastDice} 步` : "-";
-  $("telemetryFeeling").textContent = `${data.feeling ?? 1} 级`;
-  $("telemetryDebt").textContent = data.punishmentPoints ?? 0;
-
-  let desc = "奴犬空闲待命";
-  if (data.gameOver) desc = "⛓️ 奴犬已走完全程被囚禁！";
-  else if (data.feedbackStatus === "lighten") desc = `🙏 正在跪求轻点：${data.currentTask || ""}`;
-  else if (data.feedbackStatus === "abandon") desc = `❌ 奴犬胆敢违逆：${data.currentTask || ""}`;
-  else if (data.currentTask) desc = `正在受罚：${data.currentTask}`;
-  $("telemetryTaskDesc").textContent = desc;
-
-  if (data.feedbackStatus === "lighten" && data.currentTask) {
-    $("lightenTargetTaskText").textContent = data.currentTask;
-    $("lightenMasterModal").classList.remove("hidden");
-  } else {
-    $("lightenMasterModal").classList.add("hidden");
-  }
-}
 
 // Master Commands & AI Pet Reactions
 $("sendMasterCmdBtn").onclick = async () => {
@@ -6879,7 +6472,6 @@ function receiveMasterCommand(data) {
   showToast("收到主人直接发出的强制口令！", "📣");
   logChronicle(`收到主人临场口令：${cmd}`);
   updateGameUI();
-  sendOnlineGameState();
   saveActiveSession();
 }
 
@@ -6914,7 +6506,6 @@ function executeLightenAllowed(customTaskText = null) {
   $("activeEventCard").classList.add("hidden");
   showToast("主人恩准轻点！已赦免当前命令并抽取新题！", "🕊️");
   updateGameUI();
-  sendOnlineGameState();
   saveActiveSession();
   logChronicle("主人恩准轻点，重新抽取新任务");
 
@@ -6926,7 +6517,6 @@ function executeLightenAllowed(customTaskText = null) {
       };
       state.currentTaskType = "normal";
       showActiveEvent(state.currentTask, false);
-      sendOnlineGameState();
   saveActiveSession();
       return;
     }
@@ -6939,7 +6529,6 @@ function executeLightenAllowed(customTaskText = null) {
       state.currentTaskType = "normal";
       detectWaterAndAddReservoir(selected.text);
       showActiveEvent(selected, false);
-      sendOnlineGameState();
   saveActiveSession();
     }
   }, 400);
@@ -6950,7 +6539,6 @@ function executeLightenDenied() {
   showToast("主人严酷驳回求饶！命你咬牙继续执行！", "⚡");
   logChronicle("主人驳回求饶，命令继续硬抗");
   updateGameUI();
-  sendOnlineGameState();
   saveActiveSession();
 }
 
@@ -7024,481 +6612,6 @@ $("sendChatBtn").onclick = async () => {
   } catch(e){}
 };
 $("chatInput").onkeydown = e => { if (e.key === "Enter") $("sendChatBtn").click(); };
-
-// ==========================================================================
-// WEBRTC TWO-WAY AUDIO CALL
-// ==========================================================================
-function safeChannelSend(event, payload = {}) {
-  if (state.channel && state.connected) {
-    try {
-      const p = state.channel.send({ type: "broadcast", event, payload });
-      if (p && typeof p.catch === "function") {
-        p.catch(err => console.warn("Channel broadcast warning:", err));
-      }
-    } catch(err) {
-      console.warn("Channel broadcast error:", err);
-    }
-  }
-}
-
-let peerConnection = null;
-let localAudioStream = null;
-let remoteAudioElement = null;
-let voiceCallActive = false;
-let audioVisualizerActive = false;
-let iceCandidateQueue = [];
-
-const rtcConfig = {
-  iceServers: [
-    { urls: "stun:stun.l.google.com:19302" },
-    { urls: "stun:stun1.l.google.com:19302" },
-    { urls: "stun:stun.cloudflare.com:3478" },
-    { urls: "stun:stun.stunprotocol.org:3478" },
-    { urls: "stun:global.stun.twilio.com:3478" },
-    {
-      urls: [
-        "turn:openrelay.metered.ca:80",
-        "turn:openrelay.metered.ca:443",
-        "turns:openrelay.metered.ca:443?transport=tcp"
-      ],
-      username: "openrelayproject",
-      credential: "openrelayproject"
-    }
-  ],
-  iceCandidatePoolSize: 10
-};
-
-$("voiceCallBtn").onclick = () => {
-  if (!state.connected) return showToast("必须先接入房间才能开启实时语音");
-  if (voiceCallActive) endVoiceCall(true);
-  else startVoiceCall();
-};
-
-async function startVoiceCall() {
-  try {
-    localAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    initPeerConnection();
-    localAudioStream.getTracks().forEach(track => peerConnection.addTrack(track, localAudioStream));
-
-    const offer = await peerConnection.createOffer();
-    await peerConnection.setLocalDescription(offer);
-    await state.channel.send({ type: "broadcast", event: "webrtc_call_offer", payload: { sdp: offer } });
-
-    voiceCallActive = true;
-    updateCallUIState(true);
-    startAudioVisualizer(localAudioStream);
-    showToast("正在呼叫对方...", "📞");
-  } catch(e) {
-    showToast("麦克风权限被拒绝或启动失败");
-    cleanupVoiceCall();
-  }
-}
-
-function initPeerConnection() {
-  if (peerConnection) return;
-  peerConnection = new RTCPeerConnection(rtcConfig);
-  iceCandidateQueue = [];
-
-  // Connection State Monitor & Auto ICE Restart
-  peerConnection.onconnectionstatechange = () => {
-    const cs = peerConnection.connectionState;
-    if (cs === "connected") {
-      $("videoStatusBadge").textContent = "🟢 实时链路极佳";
-    } else if (cs === "connecting") {
-      $("videoStatusBadge").textContent = "🟡 正在穿透打洞…";
-    } else if (cs === "disconnected" || cs === "failed") {
-      $("videoStatusBadge").textContent = "🔴 链路重试中…";
-      try { peerConnection.restartIce(); } catch(e){}
-    }
-  };
-
-  peerConnection.ontrack = event => {
-    if (event.track.kind === "audio") {
-      // Hard Flaw 3 Fix: Use unlocked Web Audio API destination for iOS Safari playback
-      try {
-        audioFX.ensureContext();
-        if (audioFX.ctx) {
-          const streamSource = audioFX.ctx.createMediaStreamSource(event.streams[0]);
-          streamSource.connect(audioFX.ctx.destination);
-        }
-      } catch(e){}
-
-      if (!remoteAudioElement) {
-        remoteAudioElement = new Audio();
-        remoteAudioElement.autoplay = true;
-      }
-      remoteAudioElement.srcObject = event.streams[0];
-      remoteAudioElement.play().catch(()=>{});
-    } else if (event.track.kind === "video") {
-      if (state.role === "spectator") {
-        const rv = $("remoteVideo");
-        rv.srcObject = event.streams[0];
-        $("remoteVideoWrapper").classList.remove("hidden");
-        $("videoStatusBadge").textContent = "🟢 正在监控奴犬";
-
-        // iOS Safari Autoplay Check
-        rv.play().then(() => {
-          $("videoPlayOverlay").classList.add("hidden");
-        }).catch(err => {
-          $("videoPlayOverlay").classList.remove("hidden");
-        });
-      }
-    }
-  };
-
-  peerConnection.onicecandidate = ({ candidate }) => {
-    if (candidate && state.channel) {
-      safeChannelSend("webrtc_ice", { candidate });
-    }
-  };
-}
-
-// User-gesture click unlocker for video autoplay restrictions on iOS
-$("videoPlayOverlay").onclick = () => {
-  const rv = $("remoteVideo");
-  if (rv) {
-    rv.play().then(() => {
-      $("videoPlayOverlay").classList.add("hidden");
-      showToast("视界画面已顺利激活！", "▶️");
-    }).catch(()=>{});
-  }
-};
-
-// Hard Flaw 1 Fix: Call offer handles only voice audio tracks
-async function handleWebRtcCallOffer(payload) {
-  try {
-    if (!localAudioStream) {
-      localAudioStream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    }
-    initPeerConnection();
-    localAudioStream.getTracks().forEach(track => {
-      if (!peerConnection.getSenders().find(s => s.track === track)) {
-        peerConnection.addTrack(track, localAudioStream);
-      }
-    });
-
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(payload.sdp));
-    while (iceCandidateQueue.length > 0) {
-      const c = iceCandidateQueue.shift();
-      await peerConnection.addIceCandidate(new RTCIceCandidate(c));
-    }
-
-    const answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answer);
-    await state.channel.send({ type: "broadcast", event: "webrtc_answer", payload: { sdp: answer } });
-
-    voiceCallActive = true;
-    updateCallUIState(true);
-    startAudioVisualizer(localAudioStream);
-    showToast("语音通话已接通！", "📞");
-  } catch(e) {
-    cleanupVoiceCall();
-  }
-}
-
-// Hard Flaw 1 Fix: Video offer handles camera stream WITHOUT forcing receiver microphone
-async function handleWebRtcVideoOffer(payload) {
-  try {
-    initPeerConnection();
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(payload.sdp));
-
-    while (iceCandidateQueue.length > 0) {
-      const c = iceCandidateQueue.shift();
-      await peerConnection.addIceCandidate(new RTCIceCandidate(c));
-    }
-
-    const answer = await peerConnection.createAnswer();
-    await peerConnection.setLocalDescription(answer);
-    await state.channel.send({ type: "broadcast", event: "webrtc_answer", payload: { sdp: answer } });
-
-    showToast("奴犬实时视频已接通！", "📹");
-  } catch(e) {
-    console.warn("Video offer handling failed", e);
-  }
-}
-
-async function handleWebRtcAnswer(payload) {
-  if (!peerConnection) return;
-  try {
-    await peerConnection.setRemoteDescription(new RTCSessionDescription(payload.sdp));
-    while (iceCandidateQueue.length > 0) {
-      const c = iceCandidateQueue.shift();
-      await peerConnection.addIceCandidate(new RTCIceCandidate(c));
-    }
-    showToast("对方已应答，通话连接成功！", "📞");
-  } catch(e){}
-}
-
-async function handleWebRtcIce(payload) {
-  if (!payload?.candidate) return;
-  if (peerConnection && peerConnection.remoteDescription) {
-    try { await peerConnection.addIceCandidate(new RTCIceCandidate(payload.candidate)); } catch(e){}
-  } else {
-    iceCandidateQueue.push(payload.candidate);
-  }
-}
-
-function endVoiceCall(sendSignal) {
-  cleanupVoiceCall();
-  if (sendSignal && state.channel && state.connected) {
-    safeChannelSend("webrtc_end", {});
-  }
-  showToast("通话已挂断");
-}
-
-function cleanupVoiceCall() {
-  if (peerConnection) {
-    peerConnection.close();
-    peerConnection = null;
-  }
-  if (localAudioStream) {
-    localAudioStream.getTracks().forEach(t => t.stop());
-    localAudioStream = null;
-  }
-  voiceCallActive = false;
-  audioVisualizerActive = false;
-  updateCallUIState(false);
-  $("audioVisualizer").classList.add("hidden");
-}
-
-function updateCallUIState(active) {
-  const btn = $("voiceCallBtn");
-  btn.textContent = active ? "📵 挂断通话" : "📞 实时通话";
-  btn.className = `btn btn-sm ${active ? "btn-danger" : "btn-gold"}`;
-  $("audioMuteToggleBtn").classList.toggle("hidden", !active);
-}
-
-function startAudioVisualizer(stream) {
-  const canvas = $("audioVisualizer");
-  canvas.classList.remove("hidden");
-  const ctx = canvas.getContext("2d");
-  const AudioCtx = window.AudioContext || window.webkitAudioContext;
-  const aCtx = new AudioCtx();
-  const src = aCtx.createMediaStreamSource(stream);
-  const analyser = aCtx.createAnalyser();
-  analyser.fftSize = 64;
-  src.connect(analyser);
-
-  const bufferLength = analyser.frequencyBinCount;
-  const dataArray = new Uint8Array(bufferLength);
-  audioVisualizerActive = true;
-
-  function renderWave() {
-    if (!audioVisualizerActive) return;
-    requestAnimationFrame(renderWave);
-    analyser.getByteFrequencyData(dataArray);
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    const barWidth = (canvas.width / bufferLength) * 2;
-    let x = 0;
-    for (let i = 0; i < bufferLength; i++) {
-      const barHeight = (dataArray[i] / 255) * canvas.height;
-      ctx.fillStyle = `rgb(${180 + barHeight * 0.5}, 29, 72)`;
-      ctx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
-      x += barWidth + 2;
-    }
-  }
-  renderWave();
-}
-
-
-// Night Vision Video Filter
-let isNightVision = false;
-$("toggleNightVisionBtn").onclick = () => {
-  isNightVision = !isNightVision;
-  const rv = $("remoteVideo");
-  if (rv) {
-    rv.style.filter = isNightVision
-      ? "brightness(1.2) contrast(1.4) sepia(1) hue-rotate(85deg) saturate(2)"
-      : "none";
-  }
-  $("toggleNightVisionBtn").textContent = isNightVision ? "🕶️ 滤镜: 绿夜视" : "🕶️ 暗夜绿光";
-  showToast(isNightVision ? "暗夜视界滤镜已激活" : "滤镜已重置");
-};
-
-// Polaroid Capture
-$("snapPolaroidBtn").onclick = () => {
-  const rv = $("remoteVideo");
-  if (!rv || !rv.srcObject) return showToast("当前尚无视频画面");
-  try {
-    const c = document.createElement("canvas");
-    c.width = 640;
-    c.height = 480;
-    const ctx = c.getContext("2d");
-    if (isNightVision) {
-      ctx.filter = "brightness(1.2) contrast(1.4) sepia(1) hue-rotate(85deg) saturate(2)";
-    }
-    ctx.drawImage(rv, 0, 0, 640, 480);
-    const dataUrl = c.toDataURL("image/jpeg", 0.9);
-    $("polaroidImg").src = dataUrl;
-    const now = new Date();
-    const taskText = state.currentTask?.text || "调教对局中实时视察";
-    $("polaroidCaption").textContent = `[${now.toLocaleDateString()} ${now.toLocaleTimeString()}] ${taskText.slice(0, 24)}…`;
-    $("polaroidModal").classList.remove("hidden");
-    showToast("拍立得定格抓拍成功！", "📸");
-    audioFX.playRollSuccess();
-  } catch(e) {
-    showToast("抓拍失败");
-  }
-};
-$("closePolaroidBtn").onclick = () => $("polaroidModal").classList.add("hidden");
-
-// Single Direction Video
-let localVideoStream = null;
-let videoStreamActive = false;
-let currentFacingMode = "user";
-
-$("videoHeaderBar").onclick = () => {
-  const body = $("videoPanelBody");
-  const chevron = $("videoToggleChevron");
-  body.classList.toggle("hidden");
-  chevron.textContent = body.classList.contains("hidden") ? "▶" : "▼";
-};
-
-$("cameraOnBtn").onclick = async () => {
-  try {
-    localVideoStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: currentFacingMode },
-      audio: false
-    });
-    const lv = $("localVideo");
-    if (lv) {
-      lv.srcObject = localVideoStream;
-      lv.play().catch(()=>{});
-    }
-    $("localVideoWrapper").classList.remove("hidden");
-    $("videoStatusBadge").textContent = "正在传输画面";
-    $("endVideoBtn").classList.remove("hidden");
-    $("flipCameraBtn").classList.remove("hidden");
-    $("cameraOnBtn").classList.add("hidden");
-
-    initPeerConnection();
-    const videoTrack = localVideoStream.getVideoTracks()[0];
-    const existingVideoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-    if (existingVideoSender) {
-      await existingVideoSender.replaceTrack(videoTrack);
-    } else {
-      peerConnection.addTrack(videoTrack, localVideoStream);
-    }
-
-    if (peerConnection.signalingState === "stable") {
-      const offer = await peerConnection.createOffer();
-      await peerConnection.setLocalDescription(offer);
-      safeChannelSend("webrtc_video_offer", { sdp: offer });
-    }
-    safeChannelSend("video_allow", {});
-    videoStreamActive = true;
-    showToast("摄像头已启动并向主人传输！", "📹");
-  } catch(e) {
-    console.warn("Camera start failed:", e);
-    showToast("无法获取摄像头权限", "❌");
-  }
-};
-
-$("flipCameraBtn").onclick = async () => {
-  if (!localVideoStream) return;
-  try {
-    const nextFacing = currentFacingMode === "user" ? "environment" : "user";
-    const newStream = await navigator.mediaDevices.getUserMedia({
-      video: { facingMode: nextFacing },
-      audio: false
-    });
-    const newVideoTrack = newStream.getVideoTracks()[0];
-    
-    // Seamless track replacement on RTCRtpSender without dropping session or renegotiation
-    if (peerConnection) {
-      const videoSender = peerConnection.getSenders().find(s => s.track && s.track.kind === "video");
-      if (videoSender) {
-        await videoSender.replaceTrack(newVideoTrack);
-      } else {
-        peerConnection.addTrack(newVideoTrack, newStream);
-      }
-    }
-
-    // Stop old tracks cleanly
-    localVideoStream.getVideoTracks().forEach(t => t.stop());
-    localVideoStream = newStream;
-    currentFacingMode = nextFacing;
-
-    const lv = $("localVideo");
-    if (lv) {
-      lv.srcObject = newStream;
-      lv.play().catch(()=>{});
-    }
-    showToast(`已切换至${currentFacingMode === "user" ? "前置" : "后置"}摄像头`, "🔄");
-  } catch(err) {
-    console.warn("Flip camera error:", err);
-    showToast("翻转摄像头失败，请检查设备权限", "❌");
-  }
-};
-
-function endVideoStreaming(sendSignal) {
-  if (localVideoStream) {
-    localVideoStream.getTracks().forEach(t => t.stop());
-    localVideoStream = null;
-  }
-  $("localVideo").srcObject = null;
-  $("remoteVideo").srcObject = null;
-  $("localVideoWrapper").classList.add("hidden");
-  $("remoteVideoWrapper").classList.add("hidden");
-  $("endVideoBtn").classList.add("hidden");
-  $("flipCameraBtn").classList.add("hidden");
-  $("videoStatusBadge").textContent = "未开启";
-  videoStreamActive = false;
-  if (state.role === "player") $("cameraOnBtn").classList.remove("hidden");
-
-  if (sendSignal && state.channel && state.connected) {
-    safeChannelSend("video_end", {});
-  }
-  showToast("视频传输已断开");
-}
-$("endVideoBtn").onclick = () => endVideoStreaming(true);
-
-$("requestVideoBtn").onclick = () => {
-  if (!state.connected || state.role !== "spectator") return;
-  safeChannelSend("video_request", {});
-  $("videoStatusBadge").textContent = "已发送查看请求";
-  showToast("已向奴犬发送实时监控请求！", "📹");
-};
-
-function handleIncomingVideoRequest() {
-  if (state.role !== "player") return;
-  audioFX.playWarning();
-  $("videoRequestModal").classList.remove("hidden");
-}
-$("videoAllowBtn").onclick = () => {
-  $("videoRequestModal").classList.add("hidden");
-  $("cameraOnBtn").click();
-};
-$("videoDenyBtn").onclick = () => {
-  $("videoRequestModal").classList.add("hidden");
-  if (state.channel && state.connected) {
-    safeChannelSend("video_deny", {});
-  }
-  showToast("已拒绝开启视频");
-};
-function handleIncomingVideoAllow() {
-  if (state.role === "spectator") {
-    $("videoStatusBadge").textContent = "奴犬已批准，连接中…";
-    showToast("奴犬已准许开启视频！", "📹");
-  }
-}
-function handleIncomingVideoDeny() {
-  if (state.role === "spectator") {
-    $("videoStatusBadge").textContent = "奴犬羞耻拒绝";
-    showToast("奴犬拒绝了视频查看请求！", "❌");
-  }
-}
-function handleIncomingVideoEnd() {
-  endVideoStreaming(false);
-}
-
-function applyRoleViews() {
-  const isSpec = state.role === "spectator";
-  $("requestVideoBtn").classList.toggle("hidden", !isSpec);
-  $("cameraOnBtn").classList.toggle("hidden", isSpec);
-}
-
-// ==========================================================================
 // AMBIENT MACHINE & AUDIO PLAYER
 // ==========================================================================
 function toggleAmbientPanel() {
@@ -7627,71 +6740,7 @@ $("musicProgressBar").onclick = e => {
 })();
 
 // ==========================================================================
-// SHARE ROOM & PURE JS SVG QR CODE
-// ==========================================================================
-$("shareRoomBtn").onclick = () => {
-  if (!state.roomId) return;
-  const oppRole = state.role === "player" ? "spectator" : "player";
-  const url = `${window.location.origin}${window.location.pathname}#room=${state.roomId}&role=${oppRole}`;
-  $("shareRoomCodeSpan").textContent = state.roomId;
-  $("shareUrlInput").value = url;
-  renderSvgQrCode(url);
-  $("shareRoomModal").classList.remove("hidden");
-};
-$("closeShareModalBtn").onclick = () => $("shareRoomModal").classList.add("hidden");
-$("copyShareLinkBtn").onclick = () => {
-  navigator.clipboard.writeText($("shareUrlInput").value).then(() => {
-    showToast("专属邀请链接已复制到剪贴板！", "📋");
-  }).catch(() => {
-    $("shareUrlInput").select();
-    showToast("请手动长按复制输入框内容");
-  });
-};
 
-function renderSvgQrCode(text) {
-  const container = $("shareQrContainer");
-  const size = 21;
-  let svg = `<svg width="160" height="160" viewBox="0 0 ${size} ${size}" style="background:#fff;padding:8px;border-radius:12px;">`;
-  let hash = 0;
-  for (let i = 0; i < text.length; i++) hash = (hash << 5) - hash + text.charCodeAt(i);
-
-  for (let r = 0; r < size; r++) {
-    for (let c = 0; c < size; c++) {
-      const isCorner = (r < 7 && c < 7) || (r < 7 && c >= size - 7) || (r >= size - 7 && c < 7);
-      const isCornerInner = (r >= 2 && r <= 4 && c >= 2 && c <= 4) ||
-                            (r >= 2 && r <= 4 && c >= size - 5 && c <= size - 3) ||
-                            (r >= size - 5 && r <= size - 3 && c >= 2 && c <= 4);
-      const isCornerBorder = (r === 0 || r === 6 || c === 0 || c === 6) && (r < 7 && c < 7) ||
-                             (r === 0 || r === 6 || c === size - 7 || c === size - 1) && (r < 7 && c >= size - 7) ||
-                             (r === size - 7 || r === size - 1 || c === 0 || c === 6) && (r >= size - 7 && c < 7);
-
-      const val = Math.abs(Math.sin((r * size + c + hash) * 999));
-      if (isCornerBorder || isCornerInner || (!isCorner && val > 0.5)) {
-        svg += `<rect x="${c}" y="${r}" width="1" height="1" fill="#11050a" />`;
-      }
-    }
-  }
-  svg += `</svg>`;
-  container.innerHTML = svg;
-}
-
-function handleUrlHashAutoJoin() {
-  const hash = window.location.hash;
-  if (!hash) return;
-  const matchRoom = hash.match(/room=([^&]+)/);
-  const matchRole = hash.match(/role=([^&]+)/);
-  if (matchRoom) {
-    const rid = matchRoom[1];
-    setGameMode("multiplayer");
-    $("roomInput").value = rid;
-    if (matchRole && (matchRole[1] === "player" || matchRole[1] === "spectator")) {
-      state.role = matchRole[1];
-      $("rolePlayerBtn").classList.toggle("active", state.role === "player");
-      $("roleSpectatorBtn").classList.toggle("active", state.role === "spectator");
-    }
-    setTimeout(() => connectToRoom(rid), 600);
-  }
-}
 
 // Settings Modal
 $("settingsBtn").onclick = () => {
@@ -7744,7 +6793,6 @@ $("soundMuteBtn").onclick = () => {
 // INITIALIZATION
 // ==========================================================================
 applyTheme(safeGetStorage("slave_theme_v5", "crimson"));
-setGameMode(safeGetStorage("slave_game_mode", "solo"));
 updateDeepSeekBadge();
 renderTasks();
 renderFinalTasks();
@@ -7754,8 +6802,6 @@ renderBoardCircuit();
   updateActionGuide();
 renderQuickPhrases();
 updateGameUI();
-applyRoleViews();
-handleUrlHashAutoJoin();
 checkResumeSessionOnLoad();
 initHapticTouchSurface();
 
