@@ -2192,6 +2192,7 @@ html, body, button, input, select, textarea, .btn, .header-icon-btn, .board-tile
         <span>被拖拽行进里程</span>
         <span id="progressText" style="font-weight:900;color:var(--crimson);">0% (0 / 40 格)</span>
       </div>
+      <div id="chapterTitle" style="font-size:11px;color:var(--text-secondary);margin:6px 0;text-align:center;font-style:italic;">第一章 · 初入囚笼</div>
       <div class="progress-track-bg">
         <div id="progressTrackFill" class="progress-track-fill"></div>
       </div>
@@ -4043,15 +4044,38 @@ class DeepSeekMasterClient {
   }
 
   async generateDynamicTask(gameState) {
+    // 章节系统：根据进度百分比划分章节，强度递增
+    const progress = gameState.position / gameState.totalCells;
+    let chapter, chapterDesc, intensity;
+    if (progress < 0.25) {
+      chapter = "第一章 · 初入囚笼";
+      chapterDesc = "奴犬刚被戴上项圈，还带着最后一丝尊严，试探着反抗";
+      intensity = "轻度羞辱，点到为止，让它慢慢习惯被支配的感觉";
+    } else if (progress < 0.5) {
+      chapter = "第二章 · 调教深入";
+      chapterDesc = "奴犬的防线开始瓦解，羞耻感逐渐压过自尊";
+      intensity = "中度羞辱，开始涉及身体玩弄和憋尿忍耐，让它尝到恐惧的滋味";
+    } else if (progress < 0.75) {
+      chapter = "第三章 · 彻底臣服";
+      chapterDesc = "奴犬已经习惯了羞耻，开始在屈辱中产生快感";
+      intensity = "重度羞辱，指令更加变态，时长加倍，加入公开羞耻和自我贬低要求";
+    } else {
+      chapter = "终章 · 永恒奴性";
+      chapterDesc = "奴犬已经完全堕落，彻底变成了主人的专属母狗";
+      intensity = "极限羞辱，指令毫无底线，极尽变态之能事，让它在绝望中彻底沉沦";
+    }
+
     const prompt = `当前局势汇报：
 - 奴犬位置：第 ${gameState.position} 格（全程共 ${gameState.totalCells} 格）
+- 当前章节：【${chapter}】——${chapterDesc}
 - 刚才掷出点数：${gameState.lastDice} 点
 - 奴犬当前身心骚度/紧绷等级：第 ${gameState.feeling} 级
 - 累积欠下的惩罚债：${gameState.punishmentPoints} 点
 - 玩弄偏好分类：${gameState.categoryLabel || "全项混合"}
 - 游戏难度：${gameState.difficulty}
 
-请身为至尊冷酷主宰，立即赐予这只奴犬一道当前专属的调教口令！
+请身为至尊变态羞辱暴君，立即赐予这只母狗一道当前章节专属的调教口令！
+当前阶段要求：${intensity}
 必须包含明确的肢体指令与具体时长（如X分钟）或报数要求。请直接输出口令正文，不要带有任何多余客套前缀。`;
 
     return await this.call([{ role: "user", content: prompt }], "player");
@@ -5709,6 +5733,15 @@ function updateGameUI() {
   const pct = Math.min(100, Math.round((state.position / state.totalCells) * 100));
   $("progressText").textContent = `${pct}% (${state.position} / ${state.totalCells} 格)`;
   $("progressTrackFill").style.width = `${pct}%`;
+
+  // 章节标题更新
+  const progress = state.position / state.totalCells;
+  let chapter;
+  if (progress < 0.25) chapter = "第一章 · 初入囚笼";
+  else if (progress < 0.5) chapter = "第二章 · 调教深入";
+  else if (progress < 0.75) chapter = "第三章 · 彻底臣服";
+  else chapter = "终章 · 永恒奴性";
+  if ($("chapterTitle")) $("chapterTitle").textContent = chapter;
 
   $("punishVal").textContent = `${state.punishmentPoints} / ${state.punishmentThreshold}`;
   const isForcedPunish = state.currentTaskType === "force_punish";
