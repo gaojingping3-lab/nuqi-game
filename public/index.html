@@ -6668,12 +6668,24 @@ function appendChatMessage(role, msg, isAi = false) {
   }
 
   const safeMsg = escapeHtml(msg);
+  const playBtnHtml = isAi ? `<button class="chat-play-btn" data-text="${safeMsg}" data-role="${role}" style="background:none;border:none;cursor:pointer;font-size:14px;padding:2px 4px;" title="播放语音">🔊</button>` : "";
   row.innerHTML = `
-    <span class="chat-sender">${senderLabel}</span>
+    <span class="chat-sender">${senderLabel} ${playBtnHtml}</span>
     <div class="chat-bubble">${safeMsg}</div>
   `;
   win.appendChild(row);
   win.scrollTop = win.scrollHeight;
+
+  // 绑定播放按钮
+  const playBtn = row.querySelector(".chat-play-btn");
+  if (playBtn) {
+    playBtn.onclick = () => {
+      const text = playBtn.getAttribute("data-text");
+      const r = playBtn.getAttribute("data-role");
+      voiceTTS.speak(text, r === "player" ? "pet" : "master");
+    };
+  }
+
   chatHistoryLog.push({ role, content: msg });
   if (chatHistoryLog.length > 200) {
     chatHistoryLog.splice(0, chatHistoryLog.length - 200);
