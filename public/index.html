@@ -8405,17 +8405,21 @@ if ($("shootSelfBtn")) {
       state.dossier.totalWaterMl += 300;
       updateReservoirUI();
       state.punishmentPoints += 3;
-      showToast("💥 BANG！自射中弹！极刑降临！注水+300ml，惩罚债+3！", "💀");
-      logChronicle("💀 恶魔轮盘对自己扣动扳机：中弹！注入 300ml 圣水，惩罚债+3！");
+      showToast("💥 BANG！自射中弹！轮盘赌结束！极刑降临！注水+300ml，惩罚债+3！", "💀");
+      logChronicle("💀 恶魔轮盘对自己扣动扳机：中弹！轮盘赌终结，注入 300ml 圣水，惩罚债+3！");
+      // 中弹就结束这局轮盘赌
+      setTimeout(() => {
+        $("devilRouletteModal").classList.add("hidden");
+        initRouletteGame();
+      }, 2000);
+      return;
     } else {
       audioFX.playEmptyChamber();
       triggerVibrate([50]);
       state.dossier.shotsSurvived++;
       updateDevotionDefiance(25, 0);
-      state.position = Math.min(state.totalCells, state.position + 2);
-      updateGameUI();
-      showToast("✨ CLICK！空弹生还！顺从度+25，里程突进 2 格并保留开枪权！", "🎉");
-      logChronicle("✨ 恶魔轮盘自射生还！顺从心智升温，突进 2 格。");
+      showToast("✨ CLICK！空弹！你赌赢了这一轮，再选一次朝谁开枪！", "🎉");
+      logChronicle("✨ 恶魔轮盘自射空弹！幸存，继续赌局。");
     }
 
     updateRouletteCylinderUI();
@@ -8423,8 +8427,11 @@ if ($("shootSelfBtn")) {
     if ($("shootOppBtn")) $("shootOppBtn").disabled = false;
 
     if (state.roulette.currentIndex >= 6) {
-      showToast("弹巢已打空，正在重新装填恶魔轮盘……", "💀");
-      setTimeout(initRouletteGame, 1000);
+      showToast("弹巢全空，没人中弹，平局！", "⚪");
+      setTimeout(() => {
+        $("devilRouletteModal").classList.add("hidden");
+        initRouletteGame();
+      }, 1500);
     }
   };
 }
@@ -8449,12 +8456,21 @@ if ($("shootOppBtn")) {
     if (isLive) {
       audioFX.playGunshotBang();
       triggerVibrate([200, 50, 200]);
-      showToast("🎯 BANG！对方中弹受刑！哀鸣告饶！", "👑");
-      logChronicle("🎯 恶魔轮盘对准对方扣动扳机：实弹击中对方！");
+      updateDevotionDefiance(30, -20);
+      state.position = Math.min(state.totalCells, state.position + 3);
+      updateGameUI();
+      showToast("🎯 BANG！对方中弹！你赌赢了！轮盘结束！前进3格，顺从度+30！", "👑");
+      logChronicle("🎯 恶魔轮盘对准对方扣动扳机：实弹命中！赌局胜利，前进3格。");
+      // 打中对方就结束这局轮盘赌
+      setTimeout(() => {
+        $("devilRouletteModal").classList.add("hidden");
+        initRouletteGame();
+      }, 2000);
+      return;
     } else {
       audioFX.playEmptyChamber();
-      showToast("CLICK……空弹！回合交替！", "⚪");
-      logChronicle("⚪ 恶魔轮盘对准对方开枪：空弹，交出支配权。");
+      showToast("CLICK……空弹！对方幸存，你再选一次朝谁开枪！", "⚪");
+      logChronicle("⚪ 恶魔轮盘对准对方开枪：空弹，继续赌局。");
     }
 
     updateRouletteCylinderUI();
@@ -8462,8 +8478,11 @@ if ($("shootOppBtn")) {
     $("shootOppBtn").disabled = false;
 
     if (state.roulette.currentIndex >= 6) {
-      showToast("弹巢打空，重置弹药……", "💀");
-      setTimeout(initRouletteGame, 1000);
+      showToast("弹巢全空，没人中弹，平局！", "⚪");
+      setTimeout(() => {
+        $("devilRouletteModal").classList.add("hidden");
+        initRouletteGame();
+      }, 1500);
     }
   };
 }
