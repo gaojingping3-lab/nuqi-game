@@ -2985,6 +2985,10 @@ html, body, button, input, select, textarea, .btn, .header-icon-btn, .board-tile
       <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">触觉震动反馈 (支持的手机)：</div>
       <input type="checkbox" id="settingVibrateToggle" checked style="accent-color:var(--crimson);width:20px;height:20px;">
     </div>
+    <div style="margin-bottom:14px;text-align:left;">
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">Edge TTS 语音地址 (留空用浏览器自带语音)：</div>
+      <input type="text" id="settingEdgeTtsUrl" class="styled-input" placeholder="https://your-edge-tts-worker.workers.dev/tts">
+    </div>
     <div class="btn-grid">
       <button type="button" id="saveSettingsBtn" class="btn btn-primary">保存配置</button>
       <button type="button" id="closeSettingsBtn" class="btn">取消</button>
@@ -5112,29 +5116,55 @@ document.querySelectorAll(".body-part-hotspot").forEach(spot => {
 // Dynamic Beginner Action Guide Updater
 
 // ==========================================================================
-// VOICE TTS ENGINE (WEB SPEECH API)
+// VOICE TTS ENGINE (EDGE TTS + WEB SPEECH API FALLBACK)
 // ==========================================================================
 class VoiceTTSEngine {
   constructor() {
     this.synth = window.speechSynthesis || null;
     this.enabled = safeGetStorage("slave_tts_enabled", "true") === "true";
+    this.edgeTtsUrl = safeGetStorage("slave_edge_tts_url", "");
+    this.audio = null;
   }
-  speak(text, role = "master") {
-    if (!this.synth || !this.enabled || audioFX.muted) return;
+  async speak(text, role = "master") {
+    if (!this.enabled || audioFX.muted) return;
     try {
-      this.synth.cancel();
       const clean = text.replace(/\[.*?\]/g, "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9，。！？、…～\s]/g, "");
-      const utter = new SpeechSynthesisUtterance(clean);
-      utter.lang = "zh-CN";
-      if (role === "master") {
-        utter.pitch = 0.82;
-        utter.rate = 0.95;
-      } else {
-        utter.pitch = 1.28;
-        utter.rate = 0.92;
+      if (!clean.trim()) return;
+
+      // 优先用 Edge TTS（如果配置了）
+      if (this.edgeTtsUrl) {
+        try {
+          this.stop();
+          const voice = role === "master" ? "zh-CN-YunjianNeural" : "zh-CN-XiaoxiaoNeural";
+          const url = `${this.edgeTtsUrl}?text=${encodeURIComponent(clean)}&voice=${voice}`;
+          this.audio = new Audio(url);
+          this.audio.playbackRate = 0.95;
+          await this.audio.play();
+          return;
+        } catch(e) {
+          console.warn("Edge TTS failed, falling back to browser TTS:", e);
+        }
       }
-      this.synth.speak(utter);
+
+      // Fallback: 浏览器自带 TTS
+      if (this.synth) {
+        this.synth.cancel();
+        const utter = new SpeechSynthesisUtterance(clean);
+        utter.lang = "zh-CN";
+        if (role === "master") {
+          utter.pitch = 0.82;
+          utter.rate = 0.95;
+        } else {
+          utter.pitch = 1.28;
+          utter.rate = 0.92;
+        }
+        this.synth.speak(utter);
+      }
     } catch(e){}
+  }
+  stop() {
+    if (this.audio) { this.audio.pause(); this.audio = null; }
+    if (this.synth) this.synth.cancel();
   }
 }
 const voiceTTS = new VoiceTTSEngine();
@@ -6795,8 +6825,7 @@ $("settingsBtn").onclick = () => {
   $("settingPetName").value = safeGetStorage("slave_name_pet", "奴犬");
   $("settingPunishLimit").value = state.punishmentThreshold;
   $("settingVibrateToggle").checked = state.vibrateEnabled;
-  $("settingCustomUrl").value = safeGetStorage("slave_supa_url", "");
-  $("settingCustomKey").value = safeGetStorage("slave_supa_key", "");
+  $("settingEdgeTtsUrl").value = safeGetStorage("slave_edge_tts_url", "");
   $("settingsModal").classList.remove("hidden");
 };
 $("closeSettingsBtn").onclick = () => $("settingsModal").classList.add("hidden");
@@ -6805,16 +6834,8 @@ $("saveSettingsBtn").onclick = () => {
   safeSetStorage("slave_name_pet", $("settingPetName").value.trim() || "奴犬");
   state.punishmentThreshold = Math.max(1, Math.min(10, parseInt($("settingPunishLimit").value, 10) || 3));
   state.vibrateEnabled = $("settingVibrateToggle").checked;
-
-  const curl = $("settingCustomUrl").value.trim();
-  const ckey = $("settingCustomKey").value.trim();
-  if (curl && ckey) {
-    safeSetStorage("slave_supa_url", curl);
-    safeSetStorage("slave_supa_key", ckey);
-  } else {
-    safeRemoveStorage("slave_supa_url");
-    safeRemoveStorage("slave_supa_key");
-  }
+  safeSetStorage("slave_edge_tts_url", $("settingEdgeTtsUrl").value.trim());
+  voiceTTS.edgeTtsUrl = $("settingEdgeTtsUrl").value.trim();
   $("settingsModal").classList.add("hidden");
   showToast("终端设置已成功保存！", "⚙️");
 };
