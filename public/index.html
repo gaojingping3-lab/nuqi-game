@@ -7826,8 +7826,13 @@ function updateRouletteCylinderUI() {
   }
   const cylinder = $("rouletteCylinder");
   if (cylinder) {
-    const deg = -(current * 60);
-    cylinder.style.transform = `rotate(${deg}deg)`;
+    // 真随机旋转：每次都转3-5圈 + 随机偏移，然后停在当前瞄准位置
+    const baseDeg = -(current * 60);
+    const randomSpin = 360 * (3 + Math.floor(Math.random() * 3)); // 3-5圈
+    const randomOffset = Math.floor(Math.random() * 60); // 随机偏移
+    const finalDeg = baseDeg - randomSpin - randomOffset;
+    cylinder.style.transition = "transform 0.8s cubic-bezier(0.2, 0.8, 0.2, 1)";
+    cylinder.style.transform = `rotate(${finalDeg}deg)`;
   }
   
   const remaining = Math.max(0, 6 - current);
@@ -7835,6 +7840,18 @@ function updateRouletteCylinderUI() {
   const blanksLeft = remaining - livesLeft;
   if ($("rouletteChamberStatus")) {
     $("rouletteChamberStatus").textContent = `弹膛余量：${remaining} 发 (🔴 实弹 ${livesLeft} 发 / ⚪ 空弹 ${blanksLeft} 发)`;
+  }
+
+  // 紧张氛围：剩余实弹占比越高，按钮越红
+  const dangerRatio = remaining > 0 ? livesLeft / remaining : 0;
+  const selfBtn = $("shootSelfBtn");
+  const oppBtn = $("shootOppBtn");
+  if (dangerRatio >= 0.5 && selfBtn) {
+    selfBtn.style.animation = "pulse 0.8s infinite";
+    if (oppBtn) oppBtn.style.animation = "pulse 0.8s infinite";
+  } else {
+    if (selfBtn) selfBtn.style.animation = "";
+    if (oppBtn) oppBtn.style.animation = "";
   }
 
   if ($("itemGlassCount")) $("itemGlassCount").textContent = state.roulette.items.glass;
@@ -8381,14 +8398,15 @@ if ($("shootSelfBtn")) {
 
     if (isLive) {
       audioFX.playGunshotBang();
-      triggerVibrate([200, 100, 300]);
+      triggerVibrate([300, 200, 500]);
       state.dossier.shotsHit++;
-      updateDevotionDefiance(-15, 25);
-      state.reservoirVolume = Math.min(1000, state.reservoirVolume + 200);
-      state.dossier.totalWaterMl += 200;
+      updateDevotionDefiance(-30, 40);
+      state.reservoirVolume = Math.min(1000, state.reservoirVolume + 300);
+      state.dossier.totalWaterMl += 300;
       updateReservoirUI();
-      showToast("💥 BANG！击中实弹！追加注水 200ml 与残酷受罚！", "💀");
-      logChronicle("💀 恶魔轮盘对自己扣动扳机：中弹！注入 200ml 圣水！");
+      state.punishmentPoints += 3;
+      showToast("💥 BANG！自射中弹！极刑降临！注水+300ml，惩罚债+3！", "💀");
+      logChronicle("💀 恶魔轮盘对自己扣动扳机：中弹！注入 300ml 圣水，惩罚债+3！");
     } else {
       audioFX.playEmptyChamber();
       triggerVibrate([50]);
