@@ -5744,6 +5744,20 @@ function updateGameUI() {
   $("telemetryDebt").textContent = state.punishmentPoints;
 }
 
+// ROLE SELECTION
+$("rolePlayerBtn").onclick = () => {
+  state.role = "player";
+  $("rolePlayerBtn").classList.add("active");
+  $("roleSpectatorBtn").classList.remove("active");
+  updateDeepSeekBadge();
+};
+$("roleSpectatorBtn").onclick = () => {
+  state.role = "spectator";
+  $("roleSpectatorBtn").classList.add("active");
+  $("rolePlayerBtn").classList.remove("active");
+  updateDeepSeekBadge();
+};
+
 function pickRandomTask(pool, lastKey) {
   if (!pool.length) return null;
   if (pool.length === 1) return pool[0];
