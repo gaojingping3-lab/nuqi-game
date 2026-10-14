@@ -7858,14 +7858,17 @@ function startEdgeMetronomeSession() {
   if (state.edgeSession.interval) clearInterval(state.edgeSession.interval);
   if (state.edgeSession.beatTimeout) clearTimeout(state.edgeSession.beatTimeout);
 
-  function playEdgeHeartbeatBeat() {
+  function scheduleNextBeat() {
     if (!state.edgeSession.active || state.edgeSession.freezeActive) return;
-    audioFX.playHeartbeatRush(state.edgeSession.bpm);
-    triggerVibrate([25]);
-    const nextInterval = Math.max(380, Math.round(60000 / state.edgeSession.bpm));
-    state.edgeSession.beatTimeout = setTimeout(playEdgeHeartbeatBeat, nextInterval);
+    const interval = Math.max(380, Math.round(60000 / state.edgeSession.bpm));
+    state.edgeSession.beatTimeout = setTimeout(() => {
+      if (!state.edgeSession.active || state.edgeSession.freezeActive) return;
+      audioFX.playHeartbeatRush(state.edgeSession.bpm);
+      triggerVibrate([25]);
+      scheduleNextBeat();
+    }, interval);
   }
-  playEdgeHeartbeatBeat();
+  scheduleNextBeat();
 
   state.edgeSession.interval = setInterval(() => {
     if (!state.edgeSession.active || state.edgeSession.freezeActive) return;
@@ -7877,6 +7880,9 @@ function startEdgeMetronomeSession() {
       if ($("edgeBpmVal")) $("edgeBpmVal").textContent = state.edgeSession.bpm;
       const core = $("edgePulseCore");
       if (core) core.style.transform = `scale(${1 + (state.edgeSession.bpm - 70) * 0.003})`;
+      // BPM变化后立刻重排下一次节拍，不用等当前间隔跑完
+      if (state.edgeSession.beatTimeout) clearTimeout(state.edgeSession.beatTimeout);
+      scheduleNextBeat();
     }
 
     if ($("edgeDangerLevel")) {
