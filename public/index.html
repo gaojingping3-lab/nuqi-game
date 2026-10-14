@@ -5144,30 +5144,38 @@ class VoiceTTSEngine {
     this.petVoice = safeGetStorage("slave_tts_pet_voice", "shimmer");
     this.audio = null;
   }
+  // 清理文本：去掉括号里的动作描述，只保留对话台词
+  cleanText(text) {
+    return text
+      .replace(/（[^）]*）/g, "")    // 去掉中文括号动作
+      .replace(/\([^)]*\)/g, "")     // 去掉英文括号动作
+      .replace(/\[.*?\]/g, "")        // 去掉方括号标签
+      .replace(/[^\u4e00-\u9fa5a-zA-Z0-9，。！？、…～\s]/g, "")
+      .trim();
+  }
   async speak(text, role = "master") {
     if (!this.enabled || audioFX.muted) return;
     try {
-      const clean = text.replace(/\[.*?\]/g, "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9，。！？、…～\s]/g, "");
-      if (!clean.trim()) return;
+      const clean = this.cleanText(text);
+      if (!clean) return;
 
-      // 优先用 Edge TTS（POST 到同域 Pages Function）
-      try {
-        this.stop();
-        const voiceId = role === "master" ? this.masterVoice : this.petVoice;
-        const res = await fetch("/api/tts", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ text: clean, voiceId: voiceId, speed: 0.95 })
-        });
-        if (res.ok) {
-          const blob = await res.blob();
-          const url = URL.createObjectURL(blob);
-          this.audio = new Audio(url);
-          await this.audio.play();
-          return;
-        }
-      } catch(e) {
-        console.warn("Edge TTS failed, falling back to browser TTS:", e);
+      this.stop();
+
+      // 用 Edge TTS
+      const voiceId = role === "master" ? this.masterVoice : this.petVoice;
+      const res = await fetch("/api/tts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text: clean, voiceId: voiceId, speed: 1.0 })
+      });
+
+      if (res.ok) {
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        this.audio = new Audio(url);
+        this.audio.playbackRate = 1.0;
+        await this.audio.play();
+        return;
       }
 
       // Fallback: 浏览器自带 TTS
@@ -5176,18 +5184,32 @@ class VoiceTTSEngine {
         const utter = new SpeechSynthesisUtterance(clean);
         utter.lang = "zh-CN";
         if (role === "master") {
-          utter.pitch = 0.7;
-          utter.rate = 0.9;
+          utter.pitch = 0.8;
+          utter.rate = 1.0;
         } else {
-          utter.pitch = 1.3;
-          utter.rate = 0.95;
+          utter.pitch = 1.2;
+          utter.rate = 1.0;
         }
         this.synth.speak(utter);
       }
-    } catch(e){}
+    } catch(e) {
+      console.warn("TTS failed:", e);
+      // 最后兜底：浏览器TTS
+      if (this.synth) {
+        try {
+          this.synth.cancel();
+          const utter = new SpeechSynthesisUtterance(this.cleanText(text));
+          utter.lang = "zh-CN";
+          this.synth.speak(utter);
+        } catch(e2) {}
+      }
+    }
   }
   stop() {
-    if (this.audio) { this.audio.pause(); this.audio = null; }
+    if (this.audio) {
+      this.audio.pause();
+      this.audio = null;
+    }
     if (this.synth) this.synth.cancel();
   }
 }
