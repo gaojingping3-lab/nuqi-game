@@ -2986,12 +2986,26 @@ html, body, button, input, select, textarea, .btn, .header-icon-btn, .board-tile
       <input type="checkbox" id="settingVibrateToggle" checked style="accent-color:var(--crimson);width:20px;height:20px;">
     </div>
     <div style="margin-bottom:14px;text-align:left;">
-      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">主人语音音调：</div>
-      <input type="range" id="settingMasterPitch" min="0" max="2" step="0.1" value="0.7" style="width:100%;">
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">主人语音：</div>
+      <select id="settingMasterVoice" class="styled-input">
+        <option value="fable">fable (云健，低沉威严)</option>
+        <option value="alloy">alloy (云扬，专业播报)</option>
+        <option value="nova">nova (云希，阳光少年)</option>
+        <option value="echo">echo (晓北，东北大妞)</option>
+        <option value="shimmer">shimmer (晓晓，温柔娇羞)</option>
+        <option value="onyx">onyx (晓伊，活泼可爱)</option>
+      </select>
     </div>
     <div style="margin-bottom:14px;text-align:left;">
-      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">奴仆语音音调：</div>
-      <input type="range" id="settingPetPitch" min="0" max="2" step="0.1" value="1.3" style="width:100%;">
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">奴仆语音：</div>
+      <select id="settingPetVoice" class="styled-input">
+        <option value="shimmer">shimmer (晓晓，温柔娇羞)</option>
+        <option value="onyx">onyx (晓伊，活泼可爱)</option>
+        <option value="echo">echo (晓北，东北大妞)</option>
+        <option value="nova">nova (云希，阳光少年)</option>
+        <option value="fable">fable (云健，低沉威严)</option>
+        <option value="alloy">alloy (云扬，专业播报)</option>
+      </select>
     </div>
     <div class="btn-grid">
       <button type="button" id="saveSettingsBtn" class="btn btn-primary">保存配置</button>
@@ -5126,8 +5140,8 @@ class VoiceTTSEngine {
   constructor() {
     this.synth = window.speechSynthesis || null;
     this.enabled = safeGetStorage("slave_tts_enabled", "true") === "true";
-    this.masterPitch = parseFloat(safeGetStorage("slave_tts_master_pitch", "0.7"));
-    this.petPitch = parseFloat(safeGetStorage("slave_tts_pet_pitch", "1.3"));
+    this.masterVoice = safeGetStorage("slave_tts_master_voice", "fable");
+    this.petVoice = safeGetStorage("slave_tts_pet_voice", "shimmer");
     this.audio = null;
   }
   async speak(text, role = "master") {
@@ -5136,24 +5150,36 @@ class VoiceTTSEngine {
       const clean = text.replace(/\[.*?\]/g, "").replace(/[^\u4e00-\u9fa5a-zA-Z0-9，。！？、…～\s]/g, "");
       if (!clean.trim()) return;
 
-      // 用浏览器自带 TTS
+      // 优先用 Edge TTS（POST 到同域 Pages Function）
+      try {
+        this.stop();
+        const voiceId = role === "master" ? this.masterVoice : this.petVoice;
+        const res = await fetch("/api/tts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ text: clean, voiceId: voiceId, speed: 0.95 })
+        });
+        if (res.ok) {
+          const blob = await res.blob();
+          const url = URL.createObjectURL(blob);
+          this.audio = new Audio(url);
+          await this.audio.play();
+          return;
+        }
+      } catch(e) {
+        console.warn("Edge TTS failed, falling back to browser TTS:", e);
+      }
+
+      // Fallback: 浏览器自带 TTS
       if (this.synth) {
         this.synth.cancel();
         const utter = new SpeechSynthesisUtterance(clean);
         utter.lang = "zh-CN";
-
-        // 找最佳中文语音
-        const voices = this.synth.getVoices();
-        const zhVoice = voices.find(v => v.lang.includes("zh") && v.localService) ||
-                       voices.find(v => v.lang.includes("zh-CN")) ||
-                       voices.find(v => v.lang.includes("zh"));
-        if (zhVoice) utter.voice = zhVoice;
-
         if (role === "master") {
-          utter.pitch = this.masterPitch;
+          utter.pitch = 0.7;
           utter.rate = 0.9;
         } else {
-          utter.pitch = this.petPitch;
+          utter.pitch = 1.3;
           utter.rate = 0.95;
         }
         this.synth.speak(utter);
@@ -6823,8 +6849,8 @@ $("settingsBtn").onclick = () => {
   $("settingPetName").value = safeGetStorage("slave_name_pet", "奴犬");
   $("settingPunishLimit").value = state.punishmentThreshold;
   $("settingVibrateToggle").checked = state.vibrateEnabled;
-  $("settingMasterPitch").value = safeGetStorage("slave_tts_master_pitch", "0.7");
-  $("settingPetPitch").value = safeGetStorage("slave_tts_pet_pitch", "1.3");
+  $("settingMasterVoice").value = safeGetStorage("slave_tts_master_voice", "fable");
+  $("settingPetVoice").value = safeGetStorage("slave_tts_pet_voice", "shimmer");
   $("settingsModal").classList.remove("hidden");
 };
 $("closeSettingsBtn").onclick = () => $("settingsModal").classList.add("hidden");
@@ -6833,8 +6859,10 @@ $("saveSettingsBtn").onclick = () => {
   safeSetStorage("slave_name_pet", $("settingPetName").value.trim() || "奴犬");
   state.punishmentThreshold = Math.max(1, Math.min(10, parseInt($("settingPunishLimit").value, 10) || 3));
   state.vibrateEnabled = $("settingVibrateToggle").checked;
-  safeSetStorage("slave_tts_master_pitch", $("settingMasterPitch").value);
-  safeSetStorage("slave_tts_pet_pitch", $("settingPetPitch").value);
+  voiceTTS.masterVoice = $("settingMasterVoice").value;
+  voiceTTS.petVoice = $("settingPetVoice").value;
+  safeSetStorage("slave_tts_master_voice", voiceTTS.masterVoice);
+  safeSetStorage("slave_tts_pet_voice", voiceTTS.petVoice);
   $("settingsModal").classList.add("hidden");
   showToast("终端设置已成功保存！", "⚙️");
 };
