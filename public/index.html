@@ -2986,6 +2986,10 @@ html, body, button, input, select, textarea, .btn, .header-icon-btn, .board-tile
       <input type="checkbox" id="settingVibrateToggle" checked style="accent-color:var(--crimson);width:20px;height:20px;">
     </div>
     <div style="margin-bottom:14px;text-align:left;">
+      <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">自动朗读AI回复：</div>
+      <input type="checkbox" id="settingAutoPlayTts" checked style="accent-color:var(--crimson);width:20px;height:20px;">
+    </div>
+    <div style="margin-bottom:14px;text-align:left;">
       <div style="font-size:12px;color:var(--text-secondary);margin-bottom:4px;">主人语音：</div>
       <select id="settingMasterVoice" class="styled-input">
         <option value="fable">fable (云健，低沉威严)</option>
@@ -5140,6 +5144,7 @@ class VoiceTTSEngine {
   constructor() {
     this.synth = window.speechSynthesis || null;
     this.enabled = safeGetStorage("slave_tts_enabled", "true") === "true";
+    this.autoPlay = safeGetStorage("slave_tts_autoplay", "true") === "true";
     this.masterVoice = safeGetStorage("slave_tts_master_voice", "fable");
     this.petVoice = safeGetStorage("slave_tts_pet_voice", "shimmer");
     this.audio = null;
@@ -6709,7 +6714,7 @@ function appendChatMessage(role, msg, isAi = false) {
   }
 
   // AI消息自动播放语音
-  if (isAi && voiceTTS.enabled) {
+  if (isAi && voiceTTS.enabled && voiceTTS.autoPlay) {
     setTimeout(() => {
       voiceTTS.speak(msg, role === "player" ? "pet" : "master");
     }, 100);
@@ -6890,6 +6895,7 @@ $("settingsBtn").onclick = () => {
   $("settingPetName").value = safeGetStorage("slave_name_pet", "奴犬");
   $("settingPunishLimit").value = state.punishmentThreshold;
   $("settingVibrateToggle").checked = state.vibrateEnabled;
+  $("settingAutoPlayTts").checked = voiceTTS.autoPlay;
   $("settingMasterVoice").value = safeGetStorage("slave_tts_master_voice", "fable");
   $("settingPetVoice").value = safeGetStorage("slave_tts_pet_voice", "shimmer");
   $("settingsModal").classList.remove("hidden");
@@ -6900,6 +6906,8 @@ $("saveSettingsBtn").onclick = () => {
   safeSetStorage("slave_name_pet", $("settingPetName").value.trim() || "奴犬");
   state.punishmentThreshold = Math.max(1, Math.min(10, parseInt($("settingPunishLimit").value, 10) || 3));
   state.vibrateEnabled = $("settingVibrateToggle").checked;
+  voiceTTS.autoPlay = $("settingAutoPlayTts").checked;
+  safeSetStorage("slave_tts_autoplay", voiceTTS.autoPlay ? "true" : "false");
   voiceTTS.masterVoice = $("settingMasterVoice").value;
   voiceTTS.petVoice = $("settingPetVoice").value;
   safeSetStorage("slave_tts_master_voice", voiceTTS.masterVoice);
