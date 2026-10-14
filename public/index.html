@@ -8385,6 +8385,16 @@ if ($("shootSelfBtn")) {
     btn.disabled = true;
     if ($("shootOppBtn")) $("shootOppBtn").disabled = true;
     
+    // AI嘲讽/鼓励台词
+    const taunts = [
+      '🎭 AI主宰："赌啊，怂什么？把枪口对准你自己。"',
+      '🎭 AI主宰："哈哈，我喜欢看你犹豫的样子。"',
+      '🎭 AI主宰："这一发，是天堂还是地狱？"',
+      '🎭 AI主宰："扣扳机吧，我看着呢。"',
+      '🎭 AI主宰："你的手在抖哦……害怕了？"'
+    ];
+    showToast(taunts[Math.floor(Math.random() * taunts.length)], "🎭");
+    
     audioFX.playRevolverSpin();
     $("rouletteCylinder").classList.add("spinning");
     await new Promise(r => setTimeout(r, 600));
@@ -8405,9 +8415,8 @@ if ($("shootSelfBtn")) {
       state.dossier.totalWaterMl += 300;
       updateReservoirUI();
       state.punishmentPoints += 3;
-      showToast("💥 BANG！自射中弹！轮盘赌结束！极刑降临！注水+300ml，惩罚债+3！", "💀");
-      logChronicle("💀 恶魔轮盘对自己扣动扳机：中弹！轮盘赌终结，注入 300ml 圣水，惩罚债+3！");
-      // 中弹就结束这局轮盘赌
+      showToast('💥 BANG！自射中弹！AI主宰狂笑："哈哈！这就是和我赌的下场！"', "💀");
+      logChronicle("💀 恶魔轮盘对自己扣动扳机：中弹！AI主宰狂笑，注入 300ml 圣水！");
       setTimeout(() => {
         $("devilRouletteModal").classList.add("hidden");
         initRouletteGame();
@@ -8418,8 +8427,8 @@ if ($("shootSelfBtn")) {
       triggerVibrate([50]);
       state.dossier.shotsSurvived++;
       updateDevotionDefiance(25, 0);
-      showToast("✨ CLICK！空弹！你赌赢了这一轮，再选一次朝谁开枪！", "🎉");
-      logChronicle("✨ 恶魔轮盘自射空弹！幸存，继续赌局。");
+      showToast('✨ CLICK！空弹！AI主宰："啧……运气不错，再来！"', "🎉");
+      logChronicle("✨ 恶魔轮盘自射空弹！AI主宰咂嘴，继续赌局。");
     }
 
     updateRouletteCylinderUI();
@@ -8427,7 +8436,7 @@ if ($("shootSelfBtn")) {
     if ($("shootOppBtn")) $("shootOppBtn").disabled = false;
 
     if (state.roulette.currentIndex >= 6) {
-      showToast("弹巢全空，没人中弹，平局！", "⚪");
+      showToast("弹巢全空，平局！", "⚪");
       setTimeout(() => {
         $("devilRouletteModal").classList.add("hidden");
         initRouletteGame();
@@ -8442,6 +8451,16 @@ if ($("shootOppBtn")) {
     if (btn) btn.disabled = true;
     $("shootOppBtn").disabled = true;
 
+    // AI害怕台词
+    const fearLines = [
+      '🎭 AI主宰："你……你想对准我？！你敢！"',
+      '🎭 AI主宰："等等！我们再商量商量！"',
+      '🎭 AI主宰："你疯了？！把枪口放下！"',
+      '🎭 AI主宰："不……不要对着我……"',
+      '🎭 AI主宰："大胆！你竟敢以下犯上！"'
+    ];
+    showToast(fearLines[Math.floor(Math.random() * fearLines.length)], "🎭");
+    
     audioFX.playRevolverSpin();
     $("rouletteCylinder").classList.add("spinning");
     await new Promise(r => setTimeout(r, 600));
@@ -8459,9 +8478,8 @@ if ($("shootOppBtn")) {
       updateDevotionDefiance(30, -20);
       state.position = Math.min(state.totalCells, state.position + 3);
       updateGameUI();
-      showToast("🎯 BANG！对方中弹！你赌赢了！轮盘结束！前进3格，顺从度+30！", "👑");
-      logChronicle("🎯 恶魔轮盘对准对方扣动扳机：实弹命中！赌局胜利，前进3格。");
-      // 打中对方就结束这局轮盘赌
+      showToast('🎯 BANG！AI主宰惨叫："啊——！！你竟敢……！"你赌赢了！前进3格！', "👑");
+      logChronicle("🎯 恶魔轮盘对准AI主宰扣动扳机：实弹命中！赌局胜利，前进3格。");
       setTimeout(() => {
         $("devilRouletteModal").classList.add("hidden");
         initRouletteGame();
@@ -8469,8 +8487,8 @@ if ($("shootOppBtn")) {
       return;
     } else {
       audioFX.playEmptyChamber();
-      showToast("CLICK……空弹！对方幸存，你再选一次朝谁开枪！", "⚪");
-      logChronicle("⚪ 恶魔轮盘对准对方开枪：空弹，继续赌局。");
+      showToast('CLICK……空弹！AI主宰擦汗："呼……吓死我了……再来！"', "⚪");
+      logChronicle("⚪ 恶魔轮盘对准AI主宰开枪：空弹，AI松了口气。");
     }
 
     updateRouletteCylinderUI();
@@ -8478,7 +8496,7 @@ if ($("shootOppBtn")) {
     $("shootOppBtn").disabled = false;
 
     if (state.roulette.currentIndex >= 6) {
-      showToast("弹巢全空，没人中弹，平局！", "⚪");
+      showToast("弹巢全空，平局！", "⚪");
       setTimeout(() => {
         $("devilRouletteModal").classList.add("hidden");
         initRouletteGame();
